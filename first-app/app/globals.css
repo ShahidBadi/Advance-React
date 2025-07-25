@@ -1,0 +1,11 @@
+body{
+  margin-left: 100px;
+  margin-top: 20px;
+}
+.center{
+  margin-left: 200px;
+  margin-top: 20px;
+  width: 1000px;
+  height: 500px;
+  border:  solid 1px black;
+}

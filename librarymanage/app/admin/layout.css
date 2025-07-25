@@ -1,0 +1,124 @@
+/* General Layout */
+body {
+  background-color: #121212;
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.main-content {
+  padding: 1.5rem;
+  margin-left: 240px; /* assuming sidebar width */
+}
+
+/* Stat Cards */
+.stat-card {
+  background-color: #1e1e2f;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+}
+
+.icon-shape {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+/* Table Styling */
+.table thead {
+  background-color: #2a2a3c;
+}
+
+.table td,
+.table th {
+  vertical-align: middle;
+}
+
+/* Modal Styling */
+.modal-content {
+  background-color: #1e1e2f;
+  border: 1px solid #444;
+}
+
+.btn-close-white {
+  filter: invert(1);
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-badge.available {
+  background-color: #198754;
+  color: #fff;
+}
+
+.status-badge.borrowed {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.status-badge.overdue {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+/* Card Headers */
+.card-header {
+  background-color: #1c1c2e;
+  border-bottom: 1px solid #444;
+}
+
+/* Progress Bar Background Fix (Bootstrap override) */
+.progress {
+  background-color: #2a2a3c;
+}
+
+.progress-bar {
+  font-size: 0.75rem;
+}
+
+/* Avatar */
+.user-avatar {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #0d6efd;
+}
+
+/* Dropdown Menu Fixes */
+.dropdown-menu-dark {
+  background-color: #212529;
+  border: 1px solid #333;
+}
+
+.dropdown-item:hover {
+  background-color: #343a40;
+}
+
+/* Responsive Fix for Sidebar-less layout */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
+}
