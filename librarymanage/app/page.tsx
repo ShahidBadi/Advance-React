@@ -12,12 +12,12 @@ export default function Home() {
         <h1 className="display-4 fw-bold">
           Welcome to <span className="text-primary">Library Management System</span>
         </h1>
-        <p className="lead mt-3">
+        {/* <p className="lead mt-3">
           Efficiently manage books, members, and transactions in one place.
-        </p>
-        <a href="/admin" className="btn btn-outline-light btn-lg mt-4">
-          Go to Admin Dashboard
-        </a>
+        </p> */}
+        <Link href="/login" className="btn btn-outline-light btn-lg mt-4">
+          Go to Admin User Dashboard
+        </Link><br />
       </div>
     </div>
 

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraTech | Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --dark-bg: #121212;
+            --darker-bg: #0d0d0d;
+            --card-bg: #1e1e1e;
+            --card-border: #333;
+            --accent-color: #4e73df;
+            --accent-hover: #2e59d9;
+            --success: #1cc88a;
+            --text-light: #f8f9fa;
+            --text-muted: #adb5bd;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23121212"/><path d="M0 50 L100 50 M50 0 L50 100" stroke="%23222" stroke-width="1"/></svg>');
+            background-size: 100px;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .auth-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .auth-left {
+            background: linear-gradient(135deg, rgba(78, 115, 223, 0.8), rgba(28, 200, 138, 0.8));
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-left::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        .auth-right {
+            padding: 40px;
+        }
+        
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .auth-logo i {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            margin-right: 15px;
+        }
+        
+        .auth-logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .auth-logo-text span {
+            color: var(--accent-color);
+        }
+        
+        .auth-features li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .auth-features i {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            margin-right: 10px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .form-control, .form-select {
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            color: var(--text-light);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: #2a2a2a;
+            color: var(--text-light);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            padding: 0.75rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            border-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+        
+        .auth-switch {
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .auth-switch a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .auth-switch a:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--text-muted);
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #444;
+        }
+        
+        .divider::before {
+            margin-right: .75rem;
+        }
+        
+        .divider::after {
+            margin-left: .75rem;
+        }
+        
+        .social-login .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .social-login .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .social-login .btn i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .auth-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .auth-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 3px;
+        }
+        
+        .auth-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        @media (max-width: 992px) {
+            .auth-left {
+                display: none;
+            }
+        }
+        
+        .floating-book {
+            position: absolute;
+            opacity: 0.1;
+            font-size: 10rem;
+            z-index: 0;
+        }
+        
+        .book-1 {
+            top: 10%;
+            left: 10%;
+            transform: rotate(-20deg);
+            color: #fff;
+        }
+        
+        .book-2 {
+            bottom: 10%;
+            right: 10%;
+            transform: rotate(15deg);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="row g-0">
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="auth-left h-100">
+                    <i class="bi bi-book floating-book book-1"></i>
+                    <i class="bi bi-journal-bookmark floating-book book-2"></i>
+                    <div class="position-relative">
+                        <h2 class="text-white mb-4">Welcome to LibraTech</h2>
+                        <p class="text-white mb-5">Your gateway to a world of knowledge. Manage your library experience with our intuitive platform.</p>
+                        
+                        <ul class="auth-features list-unstyled">
+                            <li><i class="bi bi-check-circle"></i> Access thousands of books with a single account</li>
+                            <li><i class="bi bi-check-circle"></i> Track your reading history and preferences</li>
+                            <li><i class="bi bi-check-circle"></i> Manage your borrowings and reservations</li>
+                            <li><i class="bi bi-check-circle"></i> Receive personalized recommendations</li>
+                            <li><i class="bi bi-check-circle"></i> Secure and private data management</li>
+                        </ul>
+                        
+                        <div class="mt-5">
+                            <div class="d-flex align-items-center">
+                                <img src="https://ui-avatars.com/api/?name=J+D&background=random" class="rounded-circle me-3" width="50" alt="User">
+                                <div>
+                                    <p class="mb-0 text-white fw-bold">"This system transformed how we manage our library!"</p>
+                                    <small class="text-white">James Donovan, Head Librarian</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="auth-right h-100">
+                    <div class="auth-card h-100">
+                        <div class="auth-logo">
+                            <i class="bi bi-book"></i>
+                            <div class="auth-logo-text">Libra<span>Tech</span></div>
+                        </div>
+                        
+                        <!-- Login Form -->
+                        <div id="login-form">
+                            <h3 class="auth-title">Sign In</h3>
+                            <p class="auth-subtitle">Access your LibraTech account</p>
+                            
+                            <form>
+                                <div class="mb-4">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" placeholder="name@example.com" required>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">Password</label>
+                                    <div class="password-container">
+                                        <input type="password" class="form-control" placeholder="Enter your password" required>
+                                        <button type="button" class="password-toggle">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text text-end mt-2">
+                                        <a href="#" class="text-decoration-none">Forgot password?</a>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" id="remember">
+                                    <label class="form-check-label" for="remember">
+                                        Remember me
+                                    </label>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100">Sign In</button>
+                                
+                                <div class="divider">or continue with</div>
+                                
+                                <div class="social-login">
+                                    <button type="button" class="btn btn-outline-light w-100">
+                                        <i class="bi bi-google"></i> Sign in with Google
+                                    </button>
+                                    <button type="button" class="btn btn-outline-light w-100">
+                                        <i class="bi bi-microsoft"></i> Sign in with Microsoft
+                                    </button>
+                                    <button type="button" class="btn btn-outline-light w-100">
+                                        <i class="bi bi-github"></i> Sign in with GitHub
+                                    </button>
+                                </div>
+                                
+                                <div class="auth-switch">
+                                    Don't have an account? <a href="#" id="show-register">Register</a>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Registration Form -->
+                        <div id="register-form" style="display: none;">
+                            <h3 class="auth-title">Create Account</h3>
+                            <p class="auth-subtitle">Join our library community</p>
+                            
+                            <form>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label">First Name</label>
+                                        <input type="text" class="form-control" placeholder="John" required>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" placeholder="Doe" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" placeholder="name@example.com" required>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" placeholder="(123) 456-7890">
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label">Password</label>
+                                        <div class="password-container">
+                                            <input type="password" class="form-control" placeholder="Create password" required>
+                                            <button type="button" class="password-toggle">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label">Confirm Password</label>
+                                        <div class="password-container">
+                                            <input type="password" class="form-control" placeholder="Confirm password" required>
+                                            <button type="button" class="password-toggle">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">Account Type</label>
+                                    <select class="form-select">
+                                        <option selected>Library Member</option>
+                                        <option>Student</option>
+                                        <option>Faculty</option>
+                                        <option>Librarian</option>
+                                        <option>Administrator</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" id="terms">
+                                    <label class="form-check-label" for="terms">
+                                        I agree to the <a href="#" class="text-decoration-none">Terms and Conditions</a>
+                                    </label>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100">Create Account</button>
+                                
+                                <div class="auth-switch">
+                                    Already have an account? <a href="#" id="show-login">Sign In</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle between login and registration forms
+        document.getElementById('show-register').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+        });
+        
+        document.getElementById('show-login').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('login-form').style.display = 'block';
+        });
+        
+        // Password toggle functionality
+        const passwordToggles = document.querySelectorAll('.password-toggle');
+        passwordToggles.forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const passwordInput = this.previousElementSibling;
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('bi-eye');
+                this.querySelector('i').classList.toggle('bi-eye-slash');
+            });
+        });
+        
+        // Form submission (prevent default for demo)
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // In a real application, you would handle form submission here
+                alert('Form submitted! In a real application, this would process your login/registration.');
+            });
+        });
+    </script>
+</body>
+</html>
