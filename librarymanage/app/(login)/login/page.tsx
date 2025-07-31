@@ -3,11 +3,67 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../login.css';
+import { useRouter } from 'next/navigation'
+import { useState } from 'react';
+import { json } from 'stream/consumers';
+
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [usertype, setUsertype] = useState('');
+  const [message, setMessage] = useState('');
+
+  const handlesubmit = async (e: React.FormEvent) => {
+    if (!email || !password || !usertype) {
+      setMessage("All fields are required");
+      return;
+    }
+    try {
+      const res = await fetch("loginapi/api/login", {
+        method: 'POST',
+        body: JSON.stringify({
+          userEmail: email.toLowerCase(),
+          userPassword: password,
+          userType: usertype,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      const data = await res.json();
+      console.log(data);
+      console.log("badi")
+      if (res.ok) {
+        setMessage('login successful');
+        const type = data.userType.toLowerCase();
+          
+        if (type === 'admin') {
+          router.push('/admin');
+          return;
+        } else if (type === 'student') {
+          router.push('/user');
+          return;
+        } else {
+          setMessage("You don't redirect anywhere");
+        }
+      
+      }
+      else {
+        setMessage(data.error || 'login failed')
+      }
+    }
+    catch (err) {
+      console.error('Login error:', err);
+      setMessage('something went wrong')
+    }
+  };
+
   return (
     <div className="auth-container">
-      <div className="row g-0"  style={{width:"2000px"}}>
+      <div className="row g-0" style={{ width: "2000px" }}>
         {/* Left Pane */}
         {/* <div className="col-lg-6 d-none d-lg-block">
           <div className="auth-left h-100">
@@ -39,21 +95,29 @@ export default function LoginPage() {
               {/* Login Form */}
               <h3 className="auth-title">Sign In</h3>
               <p className="auth-subtitle">Access your LibraTech account</p>
-              <form>
+              <form onSubmit={handlesubmit}>
                 <div className="mb-4">
                   <label className="form-label">Email Address</label>
-                  <input type="email" className="form-control" placeholder="name@example.com" />
+                  <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" />
                 </div>
                 <div className="mb-4">
                   <label className="form-label">Password</label>
-                  <input type="password" className="form-control" placeholder="Enter your password" />
+                  <input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" />
                 </div>
-                <div className="form-check mb-4">
+                <div className="mb-3">
+                  <label>User Type</label>
+                  <select className="form-select" value={usertype} onChange={(e) => setUsertype(e.target.value)}>
+                    <option value="">Select type</option>
+                    <option value="admin">Admin</option>
+                    <option value="student">Student</option>
+                  </select>
+                </div>
+                {/* <div className="form-check mb-4">
                   <input className="form-check-input" type="checkbox" id="remember" />
                   <label className="form-check-label" htmlFor="remember">Remember me</label>
-                </div>
+                </div> */}
                 <button type="submit" className="btn btn-primary w-100">Sign In</button>
-
+                {message && <div className='alert alert-info mt-3 text-center'>{message}</div>}
                 <div className="divider">or continue with</div>
                 {/* <div className="social-login">
                   <button type="button" className="btn btn-outline-light w-100 mb-2">

@@ -4,6 +4,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import './layout.css'; // move your <style> content here
 import React from 'react';
 import Script from 'next/script';
+import Link from 'next/link';
 
 export const metadata = {
   title: 'LibraTech - User Portal',
@@ -24,39 +25,39 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
           <hr className="text-muted" />
           <ul className="nav nav-pills flex-column mb-auto">
             <li className="nav-item">
-              <a href="/user" className="nav-link">
+              <Link href="/user" className="nav-link">
                 <i className="bi bi-speedometer2"></i>
                 <span>Dashboard</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/user/browsebooks" className="nav-link">
+              <Link href="/user/browsebooks" className="nav-link">
                 <i className="bi bi-book"></i>
                 <span>Browse Books</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/user/mybooks" className="nav-link">
+              <Link href="/user/mybooks" className="nav-link">
                 <i className="bi bi-journal-bookmark"></i>
                 <span>My Books</span>
-              </a>
+              </Link>
             </li>
-            <li>
-              <a href="/user/history" className="nav-link">
+            {/* <li>
+              <Link href="/user/history" className="nav-link">
                 <i className="bi bi-clock-history"></i>
                 <span>Borrowing History</span>
-              </a>
-            </li>
+              </Link>
+            </li> */}
             <li>
-              <a href="/user/myprofile" className="nav-link">
+              <Link href="/user/myprofile" className="nav-link">
                 <i className="bi bi-person-circle"></i>
                 <span>My Profile</span>
-              </a>
+              </Link>
             </li>
           </ul>
           <hr className="text-muted" />
           <div className="mt-auto">
-            <a href="/user/myprofile" className="d-flex align-items-center text-white text-decoration-none">
+            <Link href="/user/myprofile" className="d-flex align-items-center text-white text-decoration-none">
               <img
                 src="https://via.placeholder.com/40"
                 alt="User"
@@ -68,7 +69,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                 <strong>John Reader</strong>
                 <small className="d-block text-muted">Premium Member</small>
               </div>
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -92,7 +93,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                 </div>
 
                 <div className="dropdown">
-                  <a
+                  <Link
                     href="#"
                     className="d-block link-light text-decoration-none dropdown-toggle"
                     data-bs-toggle="dropdown"
@@ -105,21 +106,21 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
                       height="32"
                       className="rounded-circle"
                     />
-                  </a>
+                  </Link>
                   <ul className="dropdown-menu dropdown-menu-dark text-small shadow">
                     <li>
-                      <a className="dropdown-item" href="/user/myprofile">
+                      <Link className="dropdown-item" href="/user/myprofile">
                         My Profile
-                      </a>
+                      </Link>
                     </li>
-                    <li>
-                      <a className="dropdown-item" href="#">Settings</a>
-                    </li>
+                    {/* <li>
+                      <Link className="dropdown-item" href="#">Settings</Link>
+                    </li> */}
                     <li>
                       <hr className="dropdown-divider" />
                     </li>
                     <li>
-                      <a className="dropdown-item" href="#">Sign out</a>
+                      <Link className="dropdown-item" href="#">Sign out</Link>
                     </li>
                   </ul>
                 </div>

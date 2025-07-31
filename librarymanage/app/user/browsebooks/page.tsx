@@ -104,8 +104,10 @@ export default function BrowseBooksPage() {
             <div className="card book-card h-100">
               <img src={book.img} className="book-cover card-img-top" alt="Book Cover" />
               <div className="card-body">
+                 <img src={book.img}></img>
                 <h5 className="card-title">{book.title}</h5>
-                <p className="card-text text-muted">{book.author}</p>
+               
+                <p className="card-text text-muted" style={{color:"red"}}>{book.author}</p>
                 <div className="d-flex justify-content-between align-items-center">
                   <span className={`status-badge ${book.status}`}>
                     {book.status === 'available' ? 'Available' : 'Borrowed'}

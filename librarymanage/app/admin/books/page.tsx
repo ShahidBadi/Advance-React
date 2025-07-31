@@ -1,14 +1,25 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // ✅ Required for modals
 
 export default function BooksPage() {
+   const [books, setBooks] = useState([]);
   useEffect(() => {
+     async function fetchBooks() {
+      try {
+        const res = await fetch('/admin/api/items');
+        const data = await res.json();
+        setBooks(data);
+      } catch (err) {
+        console.error("Failed to fetch books:", err);
+      }
+    }
     // Ensure Bootstrap modal JS is loaded
     require('bootstrap/dist/js/bootstrap.bundle.min.js');
+    fetchBooks();
   }, []);
 
   return (
@@ -35,18 +46,19 @@ export default function BooksPage() {
                   <th>ID</th>
                   <th>Title</th>
                   <th>Author</th>
-                  <th>Genre</th>
-                  <th>Status</th>
+                  <th>Type</th>
+                  {/* <th>Status</th> */}
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>BK-001</td>
-                  <td>The Great Gatsby</td>
-                  <td>F. Scott Fitzgerald</td>
-                  <td>Fiction</td>
-                  <td><span className="badge bg-success">Available</span></td>
+                {books.map((book:any,index)=>(
+                    <tr>
+                  <td>{index+1}</td>
+                  <td>{book.itemTitle}</td>
+                  <td>{book.itemAuthor}</td>
+                  <td>{book.itemType}</td>
+                  {/* <td><span className="badge bg-success">Available</span></td> */}
                   <td>
                     <button className="btn btn-sm btn-outline-info me-2" data-bs-toggle="modal" data-bs-target="#editBookModal">
                       <i className="bi bi-pencil"></i>
@@ -56,6 +68,8 @@ export default function BooksPage() {
                     </button>
                   </td>
                 </tr>
+                ))}
+              
                 {/* More rows... */}
               </tbody>
             </table>

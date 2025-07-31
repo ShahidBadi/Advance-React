@@ -1,4 +1,6 @@
 // ✅ File: app/admin/layout.tsx
+'use client'
+import { useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../globals.css';
@@ -6,12 +8,17 @@ import Link from 'next/link';
 import './layout.css';
 
 
-export const metadata = {
-  title: 'Library Admin Panel',
-  description: 'Admin dashboard for managing library system',
-};
+
+// export const metadata = {
+//   title: 'Library Admin Panel',
+//   description: 'Admin dashboard for managing library system',
+// };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+  require('bootstrap/dist/js/bootstrap.bundle.min.js');
+}, []);
+
   return (
     <div className="d-flex bg-dark text-white min-vh-100">
       {/* Sidebar */}

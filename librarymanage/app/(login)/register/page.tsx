@@ -3,11 +3,60 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../login.css'; // Reuse styles from login if applicable
+import { useState } from 'react';
+import { useRouter } from 'next/navigation'
 
 export default function RegisterPage() {
+  const router = useRouter()
+  const [form, setform] = useState({
+    firstName: '',
+    lastName: '',
+    fullName: '',
+    email: '',
+    password: '',
+    confirmpassword: '',
+    userType: ''
+  });
+  const [message, setMessage] = useState("");
+  const handlechange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setform({ ...form, [e.target.name]: e.target.value });
+  }
+  const handleSubmit = async (e:
+    React.FormEvent
+  ) => {
+    e.preventDefault();
+    if (form.password !== form.confirmpassword) {
+      setMessage("password do not match");
+      return;
+    }
+    const res = await fetch("/admin/api/user", {
+      method: 'POST',
+      body: JSON.stringify({
+        userFirstName: form.firstName,
+        userLastName: form.lastName,
+        userName: form.fullName,
+        userEmail: form.email,
+        userPassword: form.password,
+        userType: form.userType
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    const result = await res.json();
+    console.log("result is",result)
+
+    if (!res.ok) {
+      setMessage(result.error);
+    } else {
+      setMessage("Registration successful!");
+        router.replace('/login');
+    }
+  }
+
   return (
     <div className="auth-container">
-      <div className="row g-0" style={{width:"2000px"}}>
+      <div className="row g-0" style={{ width: "2000px" }}>
         {/* <div className="col-lg-6 d-none d-lg-block">
           <div className="auth-left h-100">
             <i className="bi bi-book floating-book book-1"></i>
@@ -35,39 +84,54 @@ export default function RegisterPage() {
               </div>
 
               <h3 className="auth-title">Create Account</h3>
-              <p className="auth-subtitle">Sign up to manage your library activity</p>
-              <form>
+              {/* <p className="auth-subtitle">Sign up to manage your library activity</p> */}
+              <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label className="form-label">Full Name</label>
-                  <input type="text" className="form-control" placeholder="John Doe" />
+                  <label className="form-label" >FistName</label>
+                  <input type="text" className="form-control" name='firstName'
+                    value={form.firstName}
+                    onChange={handlechange} placeholder='Enter First Name' required />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Email Address</label>
-                  <input type="email" className="form-control" placeholder="john@example.com" />
+                  <label className="form-label">LastName</label>
+                  <input type="text" className="form-control" name='lastName'
+                    value={form.lastName}
+                    onChange={handlechange} placeholder='Enter Last Name' required />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">FullName</label>
+                  <input type="text" className="form-control" name='fullName'
+                    value={form.fullName}
+                    onChange={handlechange} placeholder='Enter Full Name' required />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Email</label>
+                  <input type="email" className="form-control" name='email'
+                    value={form.email}
+                    onChange={handlechange} placeholder='Enter Email' required />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Password</label>
-                  <input type="password" className="form-control" placeholder="Create password" />
+                  <input type="password" className="form-control" name='password'
+                    value={form.password}
+                    onChange={handlechange} placeholder='Create password' required />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Confirm Password</label>
-                  <input type="password" className="form-control" placeholder="Repeat password" />
+                  <input type="password" className="form-control" name='confirmpassword'
+                    value={form.confirmpassword}
+                    onChange={handlechange} placeholder='Repeat password' required />
+                </div>
+                <div className="mb-4">
+                  <label>User Type</label>
+                  <select className="form-select" name='userType'
+                    value={form.userType} onChange={handlechange}>
+                    <option value="">Select type</option>
+                    <option value="admin">Admin</option>
+                    <option value="student">Student</option>
+                  </select>
                 </div>
                 <button type="submit" className="btn btn-primary w-100">Register</button>
-
-                {/* <div className="divider">or sign up with</div>
-                <div className="social-login">
-                  <button type="button" className="btn btn-outline-light w-100 mb-2">
-                    <i className="bi bi-google me-2"></i> Google
-                  </button>
-                  <button type="button" className="btn btn-outline-light w-100 mb-2">
-                    <i className="bi bi-microsoft me-2"></i> Microsoft
-                  </button>
-                  <button type="button" className="btn btn-outline-light w-100">
-                    <i className="bi bi-github me-2"></i> GitHub
-                  </button>
-                </div> */}
-
                 <div className="auth-switch text-center mt-4">
                   Already have an account? <a href="/login">Login</a>
                 </div>
