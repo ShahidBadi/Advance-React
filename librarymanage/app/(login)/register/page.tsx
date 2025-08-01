@@ -50,7 +50,7 @@ export default function RegisterPage() {
       setMessage(result.error);
     } else {
       setMessage("Registration successful!");
-        router.replace('/login');
+        router.push('/login');
     }
   }
 

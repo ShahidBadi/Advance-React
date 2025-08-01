@@ -10,9 +10,6 @@ export async function POST(req:Request){
         const body=await req.json();
         console.log("body is:",body);
         const {userEmail,userPassword,userType}=body
-        // if(!userEmail || !userPassword || !userType){
-        //     return NextResponse.json({error:'all field are required'},{status:400})
-        // }
         const user=await prisma.user.findUnique({
             where:{userEmail:userEmail},
         })
@@ -22,6 +19,7 @@ export async function POST(req:Request){
             return NextResponse.json({error:'user not found'},{status:404})
         }
         if(user.userPassword !== userPassword || user.userType !== userType ){
+            console.log("Invalid");
             return NextResponse.json({error:'invalid password or usertype'},{status:401})
         }
        

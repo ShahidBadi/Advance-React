@@ -16,12 +16,13 @@ export default function LoginPage() {
   const [message, setMessage] = useState('');
 
   const handlesubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
     if (!email || !password || !usertype) {
       setMessage("All fields are required");
       return;
     }
     try {
-      const res = await fetch("loginapi/api/login", {
+      const res = await fetch("/loginapi", {
         method: 'POST',
         body: JSON.stringify({
           userEmail: email.toLowerCase(),
@@ -34,7 +35,7 @@ export default function LoginPage() {
       });
 
       const data = await res.json();
-      console.log(data);
+      console.log("PAge:",data);
       console.log("badi")
       if (res.ok) {
         setMessage('login successful');
@@ -64,25 +65,6 @@ export default function LoginPage() {
   return (
     <div className="auth-container">
       <div className="row g-0" style={{ width: "2000px" }}>
-        {/* Left Pane */}
-        {/* <div className="col-lg-6 d-none d-lg-block">
-          <div className="auth-left h-100">
-            <i className="bi bi-book floating-book book-1"></i>
-            <i className="bi bi-journal-bookmark floating-book book-2"></i>
-            <div className="position-relative">
-              <h2 className="text-white mb-4">Welcome to LibraTech</h2>
-              <p className="text-white mb-5">Your gateway to a world of knowledge. Manage your library experience with our intuitive platform.</p>
-              <ul className="auth-features list-unstyled">
-                <li><i className="bi bi-check-circle"></i> Access thousands of books</li>
-                <li><i className="bi bi-check-circle"></i> Track your reading history</li>
-                <li><i className="bi bi-check-circle"></i> Manage borrowings and reservations</li>
-                <li><i className="bi bi-check-circle"></i> Personalized recommendations</li>
-                <li><i className="bi bi-check-circle"></i> Secure data</li>
-              </ul>
-            </div>
-          </div>
-        </div> */}
-
         {/* Right Pane (Login/Register) */}
         <div className="col-lg-12">
           <div className="auth-right h-100">
