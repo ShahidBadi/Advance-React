@@ -1,16 +1,22 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+ import { useRef } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // ✅ Required for modals
 
 export default function BooksPage() {
-   const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState([]);
+ 
+
+const closeRef = useRef<HTMLButtonElement>(null);
+
+  
   useEffect(() => {
-     async function fetchBooks() {
+    async function fetchBooks() {
       try {
-        const res = await fetch('/admin/api/items');
+        const res = await fetch('/api/book');
         const data = await res.json();
         setBooks(data);
       } catch (err) {
@@ -21,6 +27,52 @@ export default function BooksPage() {
     require('bootstrap/dist/js/bootstrap.bundle.min.js');
     fetchBooks();
   }, []);
+
+  const [form,setform]=useState({
+    Title:'',
+    Author:'',
+    ISBN:'',
+    Category:'',
+    Quantity:'',
+  });
+  const [message,setMessage]=useState("");
+  const handlechange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setform({ ...form, [e.target.name]: e.target.value });
+  }
+   
+  const handleSubmit=async (e:React.FormEvent)=>{
+    e.preventDefault();
+      const res = await fetch("/api/book", {
+      method: 'POST',
+      body: JSON.stringify({
+        Title: form.Title,
+        Author: form.Author,
+        ISBN: form.ISBN,
+        Type: form.Category,
+        Quantity: form.Quantity,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    const result=await res.json()
+    if(!res.ok){
+      alert(result.error)
+    }else{
+      alert(result.message);
+      if (closeRef.current) closeRef.current.click();
+
+    // ✅ Reset form
+    setform({
+      Title: '',
+      Author: '',
+      ISBN: '',
+      Category: '',
+      Quantity: '',
+    });
+    }
+  }
+
 
   return (
     <div className="container-fluid text-white">
@@ -52,24 +104,24 @@ export default function BooksPage() {
                 </tr>
               </thead>
               <tbody>
-                {books.map((book:any,index)=>(
-                    <tr>
-                  <td>{index+1}</td>
-                  <td>{book.itemTitle}</td>
-                  <td>{book.itemAuthor}</td>
-                  <td>{book.itemType}</td>
-                  {/* <td><span className="badge bg-success">Available</span></td> */}
-                  <td>
-                    <button className="btn btn-sm btn-outline-info me-2" data-bs-toggle="modal" data-bs-target="#editBookModal">
-                      <i className="bi bi-pencil"></i>
-                    </button>
-                    <button className="btn btn-sm btn-outline-danger">
-                      <i className="bi bi-trash"></i>
-                    </button>
-                  </td>
-                </tr>
+                {books.map((book: any, index) => (
+                  <tr>
+                    <td>{index + 1}</td>
+                    <td>{book.Title}</td>
+                    <td>{book.Author}</td>
+                    <td>{book.Type}</td>
+                    {/* <td><span className="badge bg-success">Available</span></td> */}
+                    <td>
+                      <button className="btn btn-sm btn-outline-info me-2" data-bs-toggle="modal" data-bs-target="#editBookModal">
+                        <i className="bi bi-pencil"></i>
+                      </button>
+                      <button className="btn btn-sm btn-outline-danger">
+                        <i className="bi bi-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
                 ))}
-              
+
                 {/* More rows... */}
               </tbody>
             </table>
@@ -86,22 +138,29 @@ export default function BooksPage() {
               <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="modal-body">
-              <form>
+              <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label className="form-label">Title</label>
-                  <input type="text" className="form-control" />
+                  <input type="text" className="form-control" 
+                  name='Title' value={form.Title} onChange={handlechange} 
+                  placeholder='Enter Book Title' required/>
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Author</label>
-                  <input type="text" className="form-control" />
+                  <input type="text" className="form-control" 
+                  name='Author' value={form.Author} onChange={handlechange}
+                   placeholder='Enter Author Name' required/>
                 </div>
                 <div className="mb-3">
                   <label className="form-label">ISBN</label>
-                  <input type="text" className="form-control" />
+                  <input type="text" className="form-control" 
+                  name='ISBN' value={form.ISBN} onChange={handlechange}
+                  placeholder='Enter ISBN' required/>
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Category</label>
-                  <select className="form-select">
+                  <select className="form-select" name='Category' value={form.Category} 
+                  onChange={handlechange} required>
                     <option>Fiction</option>
                     <option>Non-Fiction</option>
                     <option>Science</option>
@@ -110,14 +169,15 @@ export default function BooksPage() {
                   </select>
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Description</label>
-                  <textarea className="form-control" rows={3}></textarea>
+                  <label className="form-label">Quantity</label>
+                  <input type="text" className="form-control" name='Quantity' value={form.Quantity} 
+                  onChange={handlechange} placeholder='Enter Book Quantity' required/>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" ref={closeRef}>Cancel</button>
+                  <button type="submit" className="btn btn-primary">Add Book</button>
                 </div>
               </form>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="button" className="btn btn-primary">Add Book</button>
             </div>
           </div>
         </div>

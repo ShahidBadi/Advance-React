@@ -20,7 +20,7 @@ export default function RegisterPage() {
   const [message, setMessage] = useState("");
   const handlechange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setform({ ...form, [e.target.name]: e.target.value });
-  }
+  } 
   const handleSubmit = async (e:
     React.FormEvent
   ) => {
@@ -29,7 +29,7 @@ export default function RegisterPage() {
       setMessage("password do not match");
       return;
     }
-    const res = await fetch("/admin/api/user", {
+    const res = await fetch("/api/register", {
       method: 'POST',
       body: JSON.stringify({
         userFirstName: form.firstName,

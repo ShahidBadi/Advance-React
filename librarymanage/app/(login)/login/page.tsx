@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { json } from 'stream/consumers';
 
 
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -22,7 +23,7 @@ export default function LoginPage() {
       return;
     }
     try {
-      const res = await fetch("/loginapi", {
+      const res = await fetch("/api/login", {
         method: 'POST',
         body: JSON.stringify({
           userEmail: email.toLowerCase(),
@@ -35,22 +36,20 @@ export default function LoginPage() {
       });
 
       const data = await res.json();
-      console.log("PAge:",data);
-      console.log("badi")
       if (res.ok) {
         setMessage('login successful');
-        const type = data.userType.toLowerCase();
-          
-        if (type === 'admin') {
+        // const type = data.userType.toLowerCase();
+        if (usertype === 'admin') {
+          console.log("item set seccessfully")
           router.push('/admin');
           return;
-        } else if (type === 'student') {
+        } else if (usertype === 'student') {
           router.push('/user');
           return;
         } else {
           setMessage("You don't redirect anywhere");
         }
-      
+
       }
       else {
         setMessage(data.error || 'login failed')

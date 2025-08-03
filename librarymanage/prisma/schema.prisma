@@ -13,12 +13,13 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
-model Item{
+model Book{
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  itemTitle  String
-  itemAuthor String
-  itemType   String
-  itemImage  String
+  Title      String
+  Author     String
+  Type       String
+  ISBN       String
+  Quantity   Int 
 }
 model User{
    id             String   @id @default(auto()) @map("_id") @db.ObjectId

@@ -1,9 +1,20 @@
-"use client";
+// "use client";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+// import { useEffect, useState } from 'react';
+import { cookies } from 'next/headers';
+import { Prisma } from '@prisma/client';
+import { PrismaClient } from '@/app/generated/prisma';
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+  const prisma =new PrismaClient();
+  const cookiestore=cookies();
+    const userid=cookiestore.get('userid')?.value;
+    if(!userid){
+      return <p>user not login</p>
+    }
+    const user=await prisma.user.findUnique({where:{id:userid}})
   return (
     <div className="container-fluid text-white">
       <h2 className="page-title">User Profile</h2>
@@ -13,11 +24,11 @@ export default function ProfilePage() {
         <div className="col-md-4">
           <div className="card bg-dark text-light mb-4">
             <div className="card-body text-center">
-              <img
+              {/* <img
                 src="https://via.placeholder.com/150"
                 className="user-avatar mb-3"
                 alt="User Avatar"
-              />
+              /> */}
               <h4>Admin User</h4>
               <p className="text-muted">Library Administrator</p>
 
@@ -36,7 +47,7 @@ export default function ProfilePage() {
               <ul className="list-group list-group-flush">
                 <li className="list-group-item bg-transparent text-light d-flex">
                   <i className="bi bi-envelope me-2"></i>
-                  admin@library.com
+                  {user?.userEmail}
                 </li>
                 <li className="list-group-item bg-transparent text-light d-flex">
                   <i className="bi bi-telephone me-2"></i>
@@ -60,30 +71,24 @@ export default function ProfilePage() {
                 <div className="row">
                   <div className="col-md-6 mb-3">
                     <label className="form-label">First Name</label>
-                    <input type="text" className="form-control" value="Admin" />
+                    <input type="text" className="form-control" defaultValue={user?.userFirstName??""} />
                   </div>
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Last Name</label>
-                    <input type="text" className="form-control" value="User" />
+                    <input type="text" className="form-control" defaultValue={user?.userLastName??""} />
                   </div>
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Username</label>
-                  <input type="text" className="form-control" value="admin_user" />
+                  <input type="text" className="form-control" defaultValue={user?.userName??""} />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Email</label>
-                  <input type="email" className="form-control" value="admin@library.com" />
+                  <input type="email" className="form-control" defaultValue={user?.userEmail??""} />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Role</label>
-                  <input type="text" className="form-control" value="Administrator" disabled />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">About Me</label>
-                  <textarea className="form-control" rows={3}>
-                    Library system administrator with 5+ years of experience managing collections and operations.
-                  </textarea>
+                  <input type="text" className="form-control" defaultValue={user?.userType??""} disabled />
                 </div>
                 <button type="submit" className="btn btn-primary">Update Profile</button>
               </form>

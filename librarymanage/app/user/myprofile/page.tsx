@@ -1,8 +1,16 @@
-'use client';
+// 'use client';
 
-import React from 'react';
+import { PrismaClient } from '@/app/generated/prisma';
+import { cookies } from 'next/headers';
 
-export default function MyProfilePage() {
+export default async function MyProfilePage() {
+  const prisma=new PrismaClient();
+  const cookiestore=cookies();
+  const userid=cookiestore.get('userid')?.value;
+  if(!userid){
+    return <p>user not login</p>
+  }
+  const user=await prisma.user.findUnique({where:{id:userid}})
   return (
     <div className="page-section active">
       <h2 className="page-title">My Profile</h2>
@@ -66,16 +74,16 @@ export default function MyProfilePage() {
                 <div className="row">
                   <div className="col-md-6 mb-3">
                     <label className="form-label">First Name</label>
-                    <input type="text" className="form-control" defaultValue="John" />
+                    <input type="text" className="form-control" defaultValue={user?.userFirstName??""} />
                   </div>
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Last Name</label>
-                    <input type="text" className="form-control" defaultValue="Reader" />
+                    <input type="text" className="form-control" defaultValue={user?.userLastName??""}/>
                   </div>
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Email</label>
-                  <input type="email" className="form-control" defaultValue="john.reader@example.com" />
+                  <input type="email" className="form-control" defaultValue={user?.userEmail??""}/>
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Phone</label>
