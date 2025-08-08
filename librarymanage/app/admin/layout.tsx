@@ -6,6 +6,8 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../globals.css';
 import Link from 'next/link';
 import './layout.css';
+import { useRouter } from "next/navigation";
+
 
 
 
@@ -18,7 +20,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
   require('bootstrap/dist/js/bootstrap.bundle.min.js');
 }, []);
-
+    const router=useRouter();
+     const handlelogout= async ()=>{
+          await fetch("/api/logout",{
+            method:"POST"
+          });
+          router.push("/login")
+     }
   return (
     <div className="d-flex bg-dark text-white min-vh-100">
       {/* Sidebar */}
@@ -55,6 +63,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <li>
             <Link href="/admin/profile" className="nav-link text-white">
               <i className="bi bi-person-circle me-2"></i>Profile
+            </Link>
+          </li>
+          <li>
+            <Link href="  " className="nav-link text-white" onClick={handlelogout}>
+              <i className="bi bi-person-circle  me-2"></i>Logout
             </Link>
           </li>
         </ul>

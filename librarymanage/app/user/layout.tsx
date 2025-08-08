@@ -1,16 +1,25 @@
 // app/user/layout.tsx
+'use client'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './layout.css'; // move your <style> content here
 import React from 'react';
 import Script from 'next/script';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-export const metadata = {
-  title: 'LibraTech - User Portal',
-};
+// export const metadata = {
+//   title: 'LibraTech - User Portal',
+// };
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {
+  const router=useRouter();
+  const handlelogout= async()=>{
+    await fetch("/api/logout",{
+            method:"POST"
+          });
+          router.push("/login")
+  }
   return (
     <html lang="en">
       <body>
@@ -52,6 +61,10 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
               <Link href="/user/myprofile" className="nav-link">
                 <i className="bi bi-person-circle"></i>
                 <span>My Profile</span>
+              </Link>
+              <Link href="" className="nav-link" onClick={handlelogout}>
+                <i className="bi bi-person-circle"></i>
+                <span>Logout</span>
               </Link>
             </li>
           </ul>

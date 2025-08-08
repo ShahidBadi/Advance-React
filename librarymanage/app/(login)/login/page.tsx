@@ -39,11 +39,11 @@ export default function LoginPage() {
       if (res.ok) {
         setMessage('login successful');
         // const type = data.userType.toLowerCase();
-        if (usertype === 'admin') {
+        if (usertype === 'Admin') {
           console.log("item set seccessfully")
           router.push('/admin');
           return;
-        } else if (usertype === 'student') {
+        } else if (usertype === 'Student') {
           router.push('/user');
           return;
         } else {
@@ -89,8 +89,8 @@ export default function LoginPage() {
                   <label>User Type</label>
                   <select className="form-select" value={usertype} onChange={(e) => setUsertype(e.target.value)}>
                     <option value="">Select type</option>
-                    <option value="admin">Admin</option>
-                    <option value="student">Student</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Student">Student</option>
                   </select>
                 </div>
                 {/* <div className="form-check mb-4">

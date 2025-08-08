@@ -15,6 +15,8 @@ export default async function ProfilePage() {
       return <p>user not login</p>
     }
     const user=await prisma.user.findUnique({where:{id:userid}})
+
+    
   return (
     <div className="container-fluid text-white">
       <h2 className="page-title">User Profile</h2>

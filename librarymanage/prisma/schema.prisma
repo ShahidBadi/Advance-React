@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../app/generated/prisma"
@@ -13,21 +7,99 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
-model Book{
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  Title      String
-  Author     String
-  Type       String
-  ISBN       String
-  Quantity   Int 
-}
-model User{
-   id             String   @id @default(auto()) @map("_id") @db.ObjectId
-   userFirstName  String
-   userLastName   String  
-   userName       String
-   userEmail      String  @unique
-   userPassword   String
-   userType       String
+
+/// Enums
+enum UserType {
+  Admin
+  Student
 }
 
+enum TransactionStatus {
+  BORROWED
+  RETURNED
+  OVERDUE
+  LOST
+  RENEWED
+}
+
+enum ReservationStatus {
+  PENDING
+  READY_FOR_PICKUP
+  CANCELLED
+  FULFILLED
+}
+
+/// Models
+
+model User {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  userFirstName      String
+  userLastName       String
+  userName           String    @unique
+  userEmail          String    @unique
+  userPassword       String
+  userType           UserType 
+  membershipDate     DateTime  @default(now())
+  // relations
+  transactions       Transaction[] 
+  reservations       Reservation[]
+
+  // admin / audit
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+  model Book {
+    id           String    @id @default(auto()) @map("_id") @db.ObjectId
+    title        String
+    author       String
+    isbn         String? 
+    type         String?   // e.g. "Fiction", "Reference"
+    quantity     Int      @default(1)
+    available    Int       @default(1)
+    createdAt    DateTime  @default(now())
+    updatedAt    DateTime  @updatedAt
+
+    // relations
+    transactions Transaction[]
+    reservations Reservation[]
+  }
+
+model Transaction {
+  id            String            @id @default(auto()) @map("_id") @db.ObjectId
+  trxNumber     String            @unique            // e.g. TRX-00125
+  bookId        String            @db.ObjectId
+  memberId      String            @db.ObjectId
+  book          Book              @relation(fields: [bookId], references: [id])
+  member        User              @relation(fields: [memberId], references: [id])
+  status        TransactionStatus @default(BORROWED)
+  issuedAt      DateTime          @default(now())
+  dueAt         DateTime
+  returnedAt    DateTime? 
+  renewedCount  Int               @default(0)
+  fineAmount    Float?            @default(0.0)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  // Useful indexes (only when not duplicating an existing @unique/@id index)
+  @@index([memberId])
+  @@index([bookId])
+}
+
+model Reservation {
+  id                String            @id @default(auto()) @map("_id") @db.ObjectId
+  reservationNumber String            @unique
+  bookId            String            @db.ObjectId
+  memberId          String            @db.ObjectId
+  book              Book              @relation(fields: [bookId], references: [id])
+  member            User              @relation(fields: [memberId], references: [id])
+  status            ReservationStatus @default(PENDING)
+  reservedAt        DateTime          @default(now())
+  expiresAt         DateTime?         // date until which reservation is valid
+  fulfilledAt       DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([memberId])
+  @@index([bookId])
+}

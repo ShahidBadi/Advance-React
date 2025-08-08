@@ -1,0 +1,60 @@
+/* Dark mode custom tweaks */
+
+/* Status badges */
+.status-badge {
+  padding: .35rem .6rem;
+  font-size: .85rem;
+  border-radius: .5rem;
+}
+
+.status-badge.available {
+  background-color: rgba(25, 135, 84, 0.25); /* green tint */
+  color: #6ed89e;
+  border: 1px solid rgba(25,135,84,0.35);
+}
+
+.status-badge.borrowed {
+  background-color: rgba(220, 53, 69, 0.25); /* red tint */
+  color: #ff8f9e;
+  border: 1px solid rgba(220,53,69,0.35);
+}
+
+/* Rating stars */
+.rating-stars i {
+  font-size: 1rem;
+  margin-right: 2px;
+  vertical-align: middle;
+}
+
+/* Muted text in dark mode */
+.text-muted {
+  color: #aaaaaa !important;
+}
+
+/* Pagination */
+.pagination .page-link {
+  color: #fff;
+}
+.pagination .page-item.active .page-link {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+/* Responsive table for small screens */
+@media (max-width: 576px) {
+  .table thead {
+    display: none;
+  }
+  .table tbody tr {
+    display: block;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    background-color: #212529;
+  }
+  .table tbody tr td {
+    display: flex;
+    justify-content: space-between;
+    padding: .6rem .75rem;
+  }
+}

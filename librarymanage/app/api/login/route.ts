@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log("body is:", body);
 
-    const { userEmail, userPassword, userType } = body;
+    const { userEmail, userPassword, userType } = body ??{};
 
     const user = await prisma.user.findUnique({
       where: { userEmail: userEmail },
@@ -20,9 +20,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "user not found" }, { status: 404 });
     }
 
-    if (user.userPassword !== userPassword || user.userType !== userType) {
+    if (user.userPassword !== userPassword || user.userType.toLowerCase().trim() !== userType.toLowerCase().trim()) {
       console.log("Invalid");
-      return NextResponse.json(
+      return NextResponse.json( 
         { error: "invalid password or usertype" },
         { status: 401 }
       );

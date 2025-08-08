@@ -1,9 +1,28 @@
 "use client";
-
+import React, { useEffect, useState, useRef } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 export default function MembersPage() {
+  const [message, setMessage] = useState("");
+    const [members, setMembers] = useState<any[]>([]);
+  const closeRef = useRef<HTMLButtonElement | null>(null);
+
+  // Fetch members
+  async function fetchMembers() {
+    try {
+      const res = await fetch("/api/member");
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      setMembers(data);
+    } catch (err) {
+      console.error("Failed to fetch members:", err);
+    }
+  }
+
+  useEffect(() => {
+    fetchMembers();
+  }, []);
   return (
     <div className="container-fluid text-white">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -25,19 +44,20 @@ export default function MembersPage() {
                   <th>ID</th>
                   <th>Name</th>
                   <th>Email</th>
-                  <th>Phone</th>
+                  {/* <th>Phone</th> */}
                   <th>Membership</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>M-00125</td>
-                  <td>John Smith</td>
-                  <td>john@example.com</td>
-                  <td>(555) 123-4567</td>
-                  <td>Premium</td>
+                {members.map((member,index)=>(
+                    <tr>
+                  <td>{index+1}</td>
+                  <td>{member.userName}</td>
+                  <td>{member.userEmail}</td>
+                  {/* <td>(555) 123-4567</td> */}
+                  <td>{member.userType}</td>
                   <td><span className="badge bg-success">Active</span></td>
                   <td>
                     <button className="btn btn-sm btn-outline-info me-2" data-bs-toggle="modal" data-bs-target="#editMemberModal">
@@ -48,6 +68,8 @@ export default function MembersPage() {
                     </button>
                   </td>
                 </tr>
+                ))}
+                
                 {/* More rows can be added here */}
               </tbody>
             </table>
