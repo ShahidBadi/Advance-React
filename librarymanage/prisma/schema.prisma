@@ -96,7 +96,6 @@ model Reservation {
   status            ReservationStatus @default(PENDING)
   reservedAt        DateTime          @default(now())
   expiresAt         DateTime?         // date until which reservation is valid
-  fulfilledAt       DateTime?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 

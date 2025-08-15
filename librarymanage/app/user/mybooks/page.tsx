@@ -1,8 +1,45 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+
+interface Book {
+  title: string;
+  author: string;
+}
+
+interface Reservation {
+  id: string;
+  reservedAt: string;
+  expiresAt:string;
+  status: string;
+  book: Book;
+}
 
 export default function MyBooksPage() {
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const now=new Date();
+
+  const fetchReservations = async () => {
+    try {
+      const res = await fetch("/api/reserve");
+      const data = await res.json();
+      console.log("data is ", data);
+
+      // Make sure we use the correct key and fallback to []
+      setReservations(data.reservation || data.reservations || []);
+    } catch (err) {
+      console.error("Error fetching reservations:", err);
+      setReservations([]); // fallback to empty array
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReservations();
+  }, []);
+
   return (
     <div className="page-section active">
       <h2 className="page-title">My Books</h2>
@@ -83,63 +120,61 @@ export default function MyBooksPage() {
               <h5 className="card-title mb-0">My Reservations</h5>
             </div>
             <div className="card-body">
-              <div className="table-responsive">
-                <table className="table table-dark table-hover">
-                  <thead>
-                    <tr>
-                      <th>Book</th>
-                      <th>Reservation Date</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      {
-                        title: 'Harry Potter',
-                        author: 'J.K. Rowling',
-                        date: 'Jul 28, 2023',
-                        status: 'Ready for pickup',
-                        badge: 'available',
-                        btnStyle: 'success',
-                        icon: 'bi-check-circle',
-                        label: 'Checkout',
-                        img: 'https://via.placeholder.com/50x70/1a1a1a/cccccc?text=Potter',
-                      },
-                      {
-                        title: 'The Alchemist',
-                        author: 'Paulo Coelho',
-                        date: 'Aug 01, 2023',
-                        status: 'Waiting list: #2',
-                        badge: 'borrowed',
-                        btnStyle: 'danger',
-                        icon: 'bi-x-circle',
-                        label: 'Cancel',
-                        img: 'https://via.placeholder.com/50x70/1a1a1a/cccccc?text=Alchemist',
-                      },
-                    ].map((res, index) => (
-                      <tr key={index}>
-                        <td>
-                          <div className="d-flex align-items-center">
-                            <img src={res.img} className="me-3" style={{ width: 35 }} alt="cover" />
-                            <div>
-                              <div>{res.title}</div>
-                              <small className="text-muted">{res.author}</small>
-                            </div>
-                          </div>
-                        </td>
-                        <td>{res.date}</td>
-                        <td><span className={`status-badge ${res.badge}`}>{res.status}</span></td>
-                        <td>
-                          <button className={`btn btn-sm btn-outline-${res.btnStyle}`}>
-                            <i className={`bi ${res.icon}`}></i> {res.label}
-                          </button>
-                        </td>
+              {loading ? (
+                <p>Loading reservations...</p>
+              ) : (
+                <div className="table-responsive">
+                  <table className="table table-dark table-hover">
+                    <thead>
+                      <tr>
+                        <th>Book</th>
+                        <th>Reservation Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {reservations.length > 0 ? (
+                        reservations.map((r) => (
+                          <tr key={r.id}>
+                            <td>
+                              <div className="d-flex align-items-center">
+                                <div>
+                                  <div>{r.book?.title}</div>
+                                  <small className="text-muted">{r.book?.author}</small>
+                                </div>
+                              </div>
+                            </td>
+                            <td>{new Date(r.reservedAt).toLocaleDateString()}</td>
+                            <td>
+                              <span className={`status-badge ${r.status.toLowerCase()}`}>
+                                {r.status}
+                              </span>
+                            </td>
+                            <td>
+                              {now >= new Date(r.expiresAt)?(
+                              <button className="btn btn-sm btn-outline-success">
+                                <i className="bi bi-check-circle"></i> checkout
+                              </button>
+                              ):(
+                              <button className="btn btn-sm btn-outline-danger">
+                                <i className="bi bi-x-circle"></i> Cancel
+                              </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={4} className="text-center text-muted">
+                            No reservations found
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         </div>

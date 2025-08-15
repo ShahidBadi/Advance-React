@@ -4,7 +4,6 @@ import React, { useEffect, useState, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-
 interface Book {
   id: string;
   title: string;
@@ -16,24 +15,24 @@ interface Book {
   createdAt: string;
   updatedAt: string;
 }
-export default function BooksPage() {
 
+export default function BooksPage() {
   const [books, setBooks] = useState<any[]>([]);
-  const [editBook,setEditBook]=useState<Book| null>(null);
+  const [editBook, setEditBook] = useState<any>(null);
   const [form, setForm] = useState({
     Title: "",
     Author: "",
     ISBN: "",
-    Category: "Fiction",
+    Type: "Fiction",
     Quantity: ""
   });
   const [message, setMessage] = useState("");
-  const closeRef = useRef<HTMLButtonElement | null>(null);
+  const closeRef = useRef<HTMLButtonElement | null>(  null);
 
-  // fetchBooks defined so it can be called after adding
+  // fetchBooks
   async function fetchBooks() {
     try {
-      const res = await fetch("/api/book"); // <-- endpoint
+      const res = await fetch("/api/book");
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setBooks(data);
@@ -46,14 +45,13 @@ export default function BooksPage() {
     fetchBooks();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: any) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setMessage("");
-    // Basic validation
     if (!form.Title || !form.Author || !form.ISBN || !form.Quantity) {
       setMessage("Please fill all required fields");
       return;
@@ -63,7 +61,7 @@ export default function BooksPage() {
       Title: form.Title,
       Author: form.Author,
       ISBN: form.ISBN,
-      Type: form.Category, // backend expects Type in your earlier API (we map to prisma.type)
+      Type: form.Type,
       Quantity: Number(form.Quantity)
     };
 
@@ -78,19 +76,14 @@ export default function BooksPage() {
         alert(result.error || "Failed to add book");
       } else {
         alert(result.message || "Book added");
-        // close modal by clicking the cancel button ref
         if (closeRef.current) closeRef.current.click();
-
-        // reset form
         setForm({
           Title: "",
           Author: "",
           ISBN: "",
-          Category: "Fiction",
+          Type: "Fiction",
           Quantity: ""
         });
-
-        // refresh list
         await fetchBooks();
       }
     } catch (err) {
@@ -98,34 +91,64 @@ export default function BooksPage() {
       alert("Something went wrong");
     }
   };
-  const handleEdit = (book:any) => {
-    setEditBook(book);
+
+  
+  async function deleteBook(id: string) {
+  if (!confirm("Are you sure you want to delete this book?")) return;
+
+  const res = await fetch(`/api/book/${id}`, {
+    method: "DELETE",
+  });
+
+  if (res.ok) {
+    alert("Book deleted!");
+    // refresh your book list
+  } else {
+    alert("Failed to delete book");
+  }
+}
+
+  const handleEdit = (book: Book) => {
+    console.log(book)
+   if(!book){
+    return;
+   }
+     setEditBook(book);
     setForm({
-      Title: book.Title,
-      Author: book.Author,
-      ISBN:book.ISBN,
-      Category: book.Category || "",
-      Quantity: book.Quantity.toString(),
+      Title: book.title,
+      Author: book.author,
+      ISBN: book.isbn || "",
+      Type: book.type || "",
+      Quantity: book.quantity?.toString() || ""
     });
   };
+
   const handleUpdate = async () => {
+    if (!editBook) return;
     const res = await fetch(`/api/book/${editBook.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         Title: form.Title,
         Author: form.Author,
-        ISBN:form.ISBN,
-        Category: form.Category,
-        Quantity: parseInt(form.Quantity),
-      }),
+        ISBN: form.ISBN,
+        Type: form.Type,
+        Quantity: parseInt(form.Quantity)
+      })
     });
 
     if (res.ok) {
       await fetchBooks();
-      closeRef.current?.click();
+       if (closeRef.current) closeRef.current.click();  
     } else {
       alert("Failed to update book");
+    }
+  };
+
+    const handleDelete = async (id: string) => {
+    if (confirm("Are you sure you want to delete this book?")) {
+      await fetch(`/api/book/${id}`, { method: "DELETE" });
+      fetchBooks();
     }
   };
 
@@ -133,7 +156,11 @@ export default function BooksPage() {
     <div className="container-fluid text-white">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="page-title">Books Management</h2>
-        <button className="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#addBookModal">
+        <button
+          className="btn btn-outline-light"
+          data-bs-toggle="modal"
+          data-bs-target="#addBookModal"
+        >
           <i className="bi bi-plus-circle me-2"></i>
           Add New Book
         </button>
@@ -159,7 +186,7 @@ export default function BooksPage() {
               </thead>
               <tbody>
                 {books.map((book, index) => (
-                  <tr key={book.id ?? index}>
+                  <tr key={book.id ??book.Id?? index}>
                     <td>{index + 1}</td>
                     <td>{book.title ?? book.Title}</td>
                     <td>{book.author ?? book.Author}</td>
@@ -167,11 +194,15 @@ export default function BooksPage() {
                     <td>{book.quantity ?? book.Quantity}</td>
                     <td>{book.available ?? "-"}</td>
                     <td>
-                      <button className="btn btn-sm btn-outline-info me-2" data-bs-toggle="modal" 
-                      data-bs-target="#editBookModal" onClick={()=>handleEdit(book)}>
+                      <button
+                        className="btn btn-sm btn-outline-info me-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editBookModal"
+                        onClick={() => handleEdit(book)}
+                      >
                         <i className="bi bi-pencil"></i>
                       </button>
-                      <button className="btn btn-sm btn-outline-danger">
+                      <button className="btn btn-sm btn-outline-danger" onClick={()=>{handleDelete(book.id)}}>
                         <i className="bi bi-trash"></i>
                       </button>
                     </td>
@@ -179,7 +210,9 @@ export default function BooksPage() {
                 ))}
                 {books.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="text-center text-muted">No books found</td>
+                    <td colSpan={7} className="text-center text-muted">
+                      No books found
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -194,25 +227,60 @@ export default function BooksPage() {
           <div className="modal-content bg-dark text-light">
             <div className="modal-header">
               <h5 className="modal-title">Add New Book</h5>
-              <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button
+                type="button"
+                className="btn-close btn-close-white"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
             </div>
             <div className="modal-body">
-              <form onSubmit={handleUpdate}>
+              <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label className="form-label">Title</label>
-                  <input type="text" className="form-control" name="Title" value={editBook?.title} onChange={handleChange} placeholder="Enter Book Title" required />
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="Title"
+                    value={form.Title}
+                    onChange={handleChange}
+                    placeholder="Enter Book Title"
+                    required
+                  />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Author</label>
-                  <input type="text" className="form-control" name="Author" value={editBook?.author} onChange={handleChange} placeholder="Enter Author Name" required />
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="Author"
+                    value={form.Author}
+                    onChange={handleChange}
+                    placeholder="Enter Author Name"
+                    required
+                  />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">ISBN</label>
-                  <input type="text" className="form-control" name="ISBN" value={editBook?.isbn} onChange={handleChange} placeholder="Enter ISBN" required />
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="ISBN"
+                    value={form.ISBN}
+                    onChange={handleChange}
+                    placeholder="Enter ISBN"
+                    required
+                  />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Category</label>
-                  <select className="form-select" name="Category" value={editBook?.type} onChange={handleChange} required>
+                  <select
+                    className="form-select"
+                    name="Type"
+                    value={form.Type}
+                    onChange={handleChange}
+                    required
+                  >
                     <option value="Fiction">Fiction</option>
                     <option value="Non-Fiction">Non-Fiction</option>
                     <option value="Science">Science</option>
@@ -222,11 +290,29 @@ export default function BooksPage() {
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Quantity</label>
-                  <input type="number" min={0} className="form-control" name="Quantity" value={editBook?.quantity} onChange={handleChange} placeholder="Enter Book Quantity" required />
+                  <input
+                    type="number"
+                    min={0}
+                    className="form-control"
+                    name="Quantity"
+                    value={form.Quantity}
+                    onChange={handleChange}
+                    placeholder="Enter Book Quantity"
+                    required
+                  />
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" ref={closeRef}>Cancel</button>
-                  <button type="submit" className="btn btn-primary">Add Book</button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                    ref={closeRef}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary">
+                    Add Book
+                  </button>
                 </div>
               </form>
               {message && <div className="mt-2 alert alert-info">{message}</div>}
@@ -234,36 +320,56 @@ export default function BooksPage() {
           </div>
         </div>
       </div>
-      {/* editBookModal */}
-     <div className="modal fade" id="editBookModal" tabIndex={-1} aria-hidden="true">
+
+      {/* Edit Book Modal */}
+      <div className="modal fade" id="editBookModal" tabIndex={-1} aria-hidden="true">
         <div className="modal-dialog">
           <div className="modal-content bg-dark text-light">
             <div className="modal-header">
               <h5 className="modal-title">Edit Book</h5>
-              <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button
+                type="button"
+                className="btn-close btn-close-white"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
             </div>
             <div className="modal-body">
-              <form onSubmit={handleUpdate}>
+              <form onSubmit={(e)=>e.preventDefault()}>
                 <div className="mb-3">
                   <label className="form-label">Title</label>
-                  <input type="text" className="form-control" value={form.Title}
-                  onChange={(e)=>setEditBook((prev)=>prev?{...prev,title:e.target.value}:null)} />
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={form.Title}
+                    onChange={(e) => setForm({ ...form, Title: e.target.value })}
+                  />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Author</label>
-                  <input type="text" className="form-control" value={form.Author}
-                  onChange={(e)=>setEditBook((prev)=>prev?{...prev,author:e.target.value}:null)}/>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={form.Author}
+                    onChange={(e) => setForm({ ...form, Author: e.target.value })}
+                  />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">ISBN</label>
-                  <input type="text" className="form-control"
-                   value={form.ISBN}
-                   onChange={(e)=>setEditBook((prev)=>prev?{...prev,isbn:e.target.value}:null)} />
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={form.ISBN}
+                    onChange={(e) => setForm({ ...form, ISBN: e.target.value })}
+                  />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Category</label>
-                  <select className="form-select" value={form.Category}
-                  onChange={(e)=>setEditBook((prev)=>prev?{...prev,type:e.target.value}:null)}>
+                  <select
+                    className="form-select"
+                    value={form.Type}
+                    onChange={(e) => setForm({ ...form, Type: e.target.value })}
+                  >
                     <option>Fiction</option>
                     <option>Non-Fiction</option>
                     <option>Science</option>
@@ -273,15 +379,22 @@ export default function BooksPage() {
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Quantity</label>
-                  <input type="number" className="form-control" 
-                  value={form.Quantity} 
-                  onChange={(e)=>setEditBook((prev)=>prev?{...prev,quantity:parseInt(e.target.value)}:null)}/>
+                  <input
+                    type="number"
+                    className="form-control"
+                    value={form.Quantity}
+                    onChange={(e) => setForm({ ...form, Quantity: e.target.value })}
+                  />
                 </div>
               </form>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="button" className="btn btn-primary">Save Changes</button>
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                Cancel
+              </button>
+              <button type="button" className="btn btn-primary" onClick={handleUpdate}>
+                Save Changes
+              </button>
             </div>
           </div>
         </div>

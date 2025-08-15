@@ -23,6 +23,12 @@ export default function MembersPage() {
   useEffect(() => {
     fetchMembers();
   }, []);
+   const handleDelete = async (id: string) => {
+    if (confirm("Are you sure you want to delete this book?")) {
+      await fetch(`/api/member/${id}`, { method: "DELETE" });
+      fetchMembers();
+    }
+  };
   return (
     <div className="container-fluid text-white">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -63,7 +69,7 @@ export default function MembersPage() {
                     <button className="btn btn-sm btn-outline-info me-2" data-bs-toggle="modal" data-bs-target="#editMemberModal">
                       <i className="bi bi-pencil"></i>
                     </button>
-                    <button className="btn btn-sm btn-outline-danger">
+                    <button className="btn btn-sm btn-outline-danger" onClick={()=>{handleDelete(member.id)}}>
                       <i className="bi bi-trash"></i>
                     </button>
                   </td>

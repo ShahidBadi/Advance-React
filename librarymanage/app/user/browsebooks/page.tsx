@@ -11,7 +11,6 @@ type Book = {
   status: 'available' | 'borrowed';
   stars: number;
 };
-
 export default function BrowseBooksPage() {
   const [Books,setBooks]=useState<any[]>([]);
   async function fetchBooks() {
@@ -28,6 +27,30 @@ export default function BrowseBooksPage() {
   useEffect(()=>{
     fetchBooks()
   },[])
+
+ async function handlereserve(bookid: any) {
+  console.log("log id", bookid);
+  try {
+    const res = await fetch("/api/reserve", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bookId: bookid }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(`Error: ${data.error || "Something went wrong"}`);
+      return;
+    }
+
+    alert("Book reserved successfully!");
+    fetchBooks(); // ✅ refresh list so available count updates
+  } catch (err) {
+    console.error("Reserve error:", err);
+    alert("Failed to reserve book");
+  }
+}
 
 
   return (
@@ -78,7 +101,7 @@ export default function BrowseBooksPage() {
                 {/* <td>{renderStars(book.stars)} <span className="ms-2 small text-muted">({book.stars})</span></td> */}
                 <td className="text-center">
                   {book.available >0 ? (  
-                    <button className="btn btn-sm btn-primary w-75">
+                    <button className="btn btn-sm btn-primary w-75" onClick={()=>{handlereserve(book.id)}} >
                       <i className="bi bi-bookmark-plus me-1" /> Reserve
                     </button>
                   ) : (
