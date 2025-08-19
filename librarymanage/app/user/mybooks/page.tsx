@@ -1,10 +1,18 @@
 'use client';
 
+import { error } from 'console';
 import React, { useEffect, useState } from 'react';
 
 interface Book {
+  id:string;
   title: string;
   author: string;
+}
+interface Borrow {
+  id: string;
+  borrowedAt: string;
+  dueDate: string;
+  book: Book;
 }
 
 interface Reservation {
@@ -18,7 +26,8 @@ interface Reservation {
 export default function MyBooksPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
-  const now=new Date();
+  const [borrows, setBorrows] = useState<Borrow[]>([]);
+  
 
   const fetchReservations = async () => {
     try {
@@ -35,9 +44,53 @@ export default function MyBooksPage() {
       setLoading(false);
     }
   };
+  const fetchBorrows = async () => {
+    try {
+      const res = await fetch("/api/borrow");
+      if(!res){
+        throw new Error("failed to fetched")
+      }
+      const data = await res.json();
+      setBorrows(data.borrows || []);
+    } catch (err) {
+      console.error("Error fetching borrows:", err);
+      setBorrows([]);
+    }
+  };
+   const handleCheckout = async (reservation: Reservation) => {
+     if (!reservation.book?.id) {
+      console.error("Missing bookId in reservation:", reservation);
+      return;
+    }
+    try {
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 14);
 
+      const res = await fetch("/api/borrow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookId: reservation.book.id,
+          dueDate,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Checkout failed");
+      await fetchBorrows(); // refresh borrowed list
+      await fetchReservations(); // refresh reservations
+    } catch (err) {
+      console.error("Checkout error:", err);
+    }
+  };
+  const now=new Date();
+  const getStatus = (dueDate: string) => {
+    const now = new Date();
+    const due = new Date(dueDate);
+    return now > due ? "Overdue ❌" : "Active ✅";
+  };
   useEffect(() => {
     fetchReservations();
+    fetchBorrows();
   }, []);
 
   return (
@@ -65,42 +118,20 @@ export default function MyBooksPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {[
-                      {
-                        title: 'The Great Gatsby',
-                        author: 'F. Scott Fitzgerald',
-                        borrow: 'Jul 20, 2023',
-                        due: 'Aug 15, 2023',
-                        img: 'https://via.placeholder.com/50x70/1a1a1a/cccccc?text=Gatsby',
-                      },
-                      {
-                        title: 'To Kill a Mockingbird',
-                        author: 'Harper Lee',
-                        borrow: 'Jul 22, 2023',
-                        due: 'Aug 18, 2023',
-                        img: 'https://via.placeholder.com/50x70/1a1a1a/cccccc?text=Mockingbird',
-                      },
-                      {
-                        title: '1984',
-                        author: 'George Orwell',
-                        borrow: 'Jul 25, 2023',
-                        due: 'Aug 10, 2023',
-                        img: 'https://via.placeholder.com/50x70/1a1a1a/cccccc?text=1984',
-                      },
-                    ].map((book, index) => (
+                    {borrows.map((b, index) => (
                       <tr key={index}>
                         <td>
                           <div className="d-flex align-items-center">
-                            <img src={book.img} className="me-3" style={{ width: 35 }} alt="cover" />
+                            {/* <img src={book.img} className="me-3" style={{ width: 35 }} alt="cover" /> */}
                             <div>
-                              <div>{book.title}</div>
-                              <small className="text-muted">{book.author}</small>
+                              <div>{b.book.title}</div>
+                              <small className="text-muted">{b.book.author}</small>
                             </div>
                           </div>
                         </td>
-                        <td>{book.borrow}</td>
-                        <td>{book.due}</td>
-                        <td><span className="status-badge borrowed">Borrowed</span></td>
+                        <td>{new Date(b.borrowedAt).toLocaleDateString()}</td>
+                        <td>{new Date(b.dueDate).toLocaleDateString()}</td>
+                        <td><span className="status-badge borrowed">{getStatus(b.dueDate)}</span></td>
                         <td>
                           <button className="btn btn-sm btn-outline-info">
                             <i className="bi bi-arrow-repeat"></i> Renew
@@ -152,8 +183,9 @@ export default function MyBooksPage() {
                               </span>
                             </td>
                             <td>
-                              {now >= new Date(r.expiresAt)?(
-                              <button className="btn btn-sm btn-outline-success">
+                              {now <= new Date(r.expiresAt)?(
+                              <button className="btn btn-sm btn-outline-success" 
+                              onClick={()=>{handleCheckout(r)}}>
                                 <i className="bi bi-check-circle"></i> checkout
                               </button>
                               ):(

@@ -43,6 +43,7 @@ model User {
   // relations
   transactions       Transaction[] 
   reservations       Reservation[]
+  borrows            Borrow[]
 
   // admin / audit
   createdAt          DateTime  @default(now())
@@ -63,6 +64,7 @@ model User {
     // relations
     transactions Transaction[]
     reservations Reservation[]
+    borrows Borrow[]
   }
 
 model Transaction {
@@ -102,3 +104,19 @@ model Reservation {
   @@index([memberId])
   @@index([bookId])
 }
+
+model Borrow {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  bookId     String   @db.ObjectId
+  memberId   String   @db.ObjectId
+  book       Book     @relation(fields: [bookId], references: [id])
+  member     User     @relation(fields: [memberId], references: [id])
+  borrowedAt DateTime @default(now())
+  dueDate    DateTime
+  returnedAt DateTime?
+  status     String   @default("BORROWED") // BORROWED | RETURNED | OVERDUE
+
+   @@index([bookId])
+  @@index([memberId])
+}
+

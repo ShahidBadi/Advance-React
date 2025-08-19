@@ -64,13 +64,15 @@ export async function GET(){
                 include:{
                   book:{
                     select:{
+                      id:true,
                       title:true,
                       author:true
                     }
                 }},
                 orderBy:{reservedAt:"desc"}
             })
-            return NextResponse.json({reservation});
+            return NextResponse.json({ reservations: reservation });
+
         }catch(err){
           return NextResponse.json({ error: "Server error" }, { status: 500 });
         }
