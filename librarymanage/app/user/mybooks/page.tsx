@@ -4,21 +4,21 @@ import { error } from 'console';
 import React, { useEffect, useState } from 'react';
 
 interface Book {
-  id:string;
+  id: string;
   title: string;
   author: string;
 }
 interface Borrow {
   id: string;
-  borrowedAt: string;
-  dueDate: string;
+  issuedAt: string;
+  dueAt: string;
   book: Book;
 }
 
 interface Reservation {
   id: string;
   reservedAt: string;
-  expiresAt:string;
+  expiresAt: string;
   status: string;
   book: Book;
 }
@@ -27,7 +27,7 @@ export default function MyBooksPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [borrows, setBorrows] = useState<Borrow[]>([]);
-  
+
 
   const fetchReservations = async () => {
     try {
@@ -47,7 +47,7 @@ export default function MyBooksPage() {
   const fetchBorrows = async () => {
     try {
       const res = await fetch("/api/borrow");
-      if(!res){
+      if (!res) {
         throw new Error("failed to fetched")
       }
       const data = await res.json();
@@ -57,8 +57,8 @@ export default function MyBooksPage() {
       setBorrows([]);
     }
   };
-   const handleCheckout = async (reservation: Reservation) => {
-     if (!reservation.book?.id) {
+  const handleCheckout = async (reservation: Reservation) => {
+    if (!reservation.book?.id) {
       console.error("Missing bookId in reservation:", reservation);
       return;
     }
@@ -82,7 +82,38 @@ export default function MyBooksPage() {
       console.error("Checkout error:", err);
     }
   };
-  const now=new Date();
+   const handleReturn = async (borrowId: string) => {
+    try {
+      const res = await fetch(`/api/borrow/${borrowId}`, {
+        method: "PUT",
+      });
+      if (!res.ok) throw new Error("Return failed");
+
+      await fetchBorrows(); // refresh list
+      await fetchReservations();
+    } catch (err) {
+      console.error("Return error:", err);
+    }
+  };
+   const handleRenew = async (id: string) => {
+    try {
+      const res = await fetch(`/api/renew/${id}`, {
+        method: "PUT",
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Book renewed successfully!");
+        fetchBorrows(); // refresh list
+      } else {
+        alert(data.error || "Failed to renew book");
+      }
+    } catch (err) {
+      console.error("Renew error:", err);
+      alert("Something went wrong!");
+    }
+  };
+  const now = new Date();
   const getStatus = (dueDate: string) => {
     const now = new Date();
     const due = new Date(dueDate);
@@ -129,12 +160,19 @@ export default function MyBooksPage() {
                             </div>
                           </div>
                         </td>
-                        <td>{new Date(b.borrowedAt).toLocaleDateString()}</td>
-                        <td>{new Date(b.dueDate).toLocaleDateString()}</td>
-                        <td><span className="status-badge borrowed">{getStatus(b.dueDate)}</span></td>
+                        <td>{new Date(b.issuedAt).toLocaleDateString()}</td>
+                        <td>{new Date(b.dueAt).toLocaleDateString()}</td>
+                        <td><span className="status-badge borrowed">{getStatus(b.dueAt)}</span></td>
                         <td>
-                          <button className="btn btn-sm btn-outline-info">
+                          <button className="btn btn-sm btn-outline-info" onClick={()=>{handleRenew(b.id)}}>
                             <i className="bi bi-arrow-repeat"></i> Renew
+                          </button>
+                          <button
+                          onClick={()=>{handleReturn(b.id)}}
+                            className="btn btn-sm btn-outline-danger"
+                            style={{marginLeft:5}}
+                          >
+                            <i className="bi bi-box-arrow-left"></i> Return
                           </button>
                         </td>
                       </tr>
@@ -183,15 +221,15 @@ export default function MyBooksPage() {
                               </span>
                             </td>
                             <td>
-                              {now <= new Date(r.expiresAt)?(
-                              <button className="btn btn-sm btn-outline-success" 
-                              onClick={()=>{handleCheckout(r)}}>
-                                <i className="bi bi-check-circle"></i> checkout
-                              </button>
-                              ):(
-                              <button className="btn btn-sm btn-outline-danger">
-                                <i className="bi bi-x-circle"></i> Cancel
-                              </button>
+                              {now <= new Date(r.expiresAt) ? (
+                                <button className="btn btn-sm btn-outline-success"
+                                  onClick={() => { handleCheckout(r) }}>
+                                  <i className="bi bi-check-circle"></i> checkout
+                                </button>
+                              ) : (
+                                <button className="btn btn-sm btn-outline-danger">
+                                  <i className="bi bi-x-circle"></i> Cancel
+                                </button>
                               )}
                             </td>
                           </tr>

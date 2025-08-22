@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const items = await prisma.user.findMany();
+    const items = await prisma.user.findMany({where:{userType:"Student"}});
     return NextResponse.json(items,{status:200});
   } catch (err) {
     console.error("GET /api/books error:", err);

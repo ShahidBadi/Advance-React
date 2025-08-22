@@ -2,8 +2,48 @@
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-
+import { useEffect, useState } from 'react';
+interface Book {
+  id: string;
+  title: string;
+  author: string;
+}
+interface Member {
+  id: string;
+  userFirstName: string;
+  userLastName: string;
+  userName:string
+}
+interface Borrow {
+  id: string;
+  trxNumber:string,
+  issuedAt: string;
+  dueAt: string;
+  returnedAt:string
+  renewcount: number;
+  status:string,
+  book: Book;
+  member:Member
+}
 export default function TransactionPage() {
+  const [borrows, setBorrows] = useState<Borrow[]>([]);
+       
+        useEffect(()=>{
+           const fetchBorrows = async () => {
+          try {
+            const res = await fetch("/api/transaction");
+            if (!res) {
+              throw new Error("failed to fetched")
+            }
+            const data = await res.json();
+            console.log("fetched borrows",data)
+            setBorrows(data.borrows || []);
+          } catch (err) {
+            console.error("Error fetching borrows:", err);
+          }
+        };
+        fetchBorrows()
+        },[])
   return (
     <div className="container-fluid text-white">
       <h2 className="page-title mb-4">Transactions</h2>
@@ -102,37 +142,51 @@ export default function TransactionPage() {
                   <th>Borrow Date</th>
                   <th>Due Date</th>
                   <th>Return Date</th>
+                  <th>Renew Count</th>
                   <th>Status</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>TRX-00125</td>
-                  <td>The Great Gatsby</td>
-                  <td>John Smith</td>
-                  <td>2023-07-20</td>
-                  <td>2023-08-03</td>
-                  <td>-</td>
-                  <td><span className="status-badge borrowed">Borrowed</span></td>
-                </tr>
-                <tr>
-                  <td>TRX-00124</td>
-                  <td>To Kill a Mockingbird</td>
-                  <td>Emma Johnson</td>
-                  <td>2023-07-19</td>
-                  <td>2023-08-02</td>
-                  <td>2023-08-01</td>
-                  <td><span className="status-badge available">Returned</span></td>
-                </tr>
-                <tr>
-                  <td>TRX-00123</td>
-                  <td>1984</td>
-                  <td>Michael Brown</td>
-                  <td>2023-07-18</td>
-                  <td>2023-07-25</td>
-                  <td>2023-08-01</td>
-                  <td><span className="status-badge overdue">Overdue</span></td>
-                </tr>
+                 {borrows.length > 0 ? (
+                  borrows.map((borrow) => (
+                    <tr key={borrow.id}>
+                      <td>{borrow.trxNumber}</td>
+                      <td>{borrow.book?.title}</td>
+                      <td>
+                        {borrow.member?.userFirstName}{" "}
+                        {borrow.member?.userLastName}
+                      </td>
+                      <td>{new Date(borrow.issuedAt).toLocaleDateString()}</td>
+                      <td>{new Date(borrow.dueAt).toLocaleDateString()}</td>
+                      <td>
+                        {borrow.returnedAt
+                          ? new Date(borrow.returnedAt).toLocaleDateString()
+                          : "-"}
+                      </td>
+                       <td>{borrow.renewcount ?? 0}</td>
+                      
+                      <td>
+                        <span
+                          className={`status-badge ${
+                            borrow.status === "BORROWED"
+                              ? "borrowed"
+                              : borrow.status === "RETURNED"
+                              ? "available"
+                              : "overdue"
+                          }`}
+                        >
+                          {borrow.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={7} className="text-center">
+                      No transactions found
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

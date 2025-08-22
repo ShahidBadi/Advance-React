@@ -19,6 +19,9 @@ export async function POST(req: Request) {
     if (!user) {
       return NextResponse.json({ error: "user not found" }, { status: 404 });
     }
+    if(user.isBlocked){
+      return NextResponse.json({ error: "Admin Locked You" }, { status: 403 })
+    }
 
     if (user.userPassword !== userPassword || user.userType.toLowerCase().trim() !== userType.toLowerCase().trim()) {
       console.log("Invalid");

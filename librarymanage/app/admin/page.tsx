@@ -3,8 +3,46 @@
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-
+import { useEffect, useState } from "react";
+interface Book {
+  id: string;
+  title: string;
+  author: string;
+}
+interface Member {
+  id: string;
+  userFirstName: string;
+  userLastName: string;
+  userName:string
+}
+interface Borrow {
+  id: string;
+  trxNumber:string,
+  issuedAt: string;
+  dueAt: string;
+  status:string,
+  book: Book;
+  member:Member
+}
 export default function AdminDashboard() {
+    const [borrows, setBorrows] = useState<Borrow[]>([]);
+     
+      useEffect(()=>{
+         const fetchBorrows = async () => {
+        try {
+          const res = await fetch("/api/transaction");
+          if (!res) {
+            throw new Error("failed to fetched")
+          }
+          const data = await res.json();
+          console.log("fetched borrows",data)
+          setBorrows(data.borrows || []);
+        } catch (err) {
+          console.error("Error fetching borrows:", err);
+        }
+      };
+      fetchBorrows()
+      },[])
   return (
     <div className="container-fluid text-light">
       <h2 className="mb-4">Dashboard</h2>
@@ -101,30 +139,26 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>TRX-00125</td>
-                    <td>The Great Gatsby</td>
-                    <td>John Smith</td>
-                    <td>2023-07-20</td>
-                    <td>2023-08-03</td>
-                    <td><span className="badge bg-warning">Borrowed</span></td>
-                  </tr>
-                  <tr>
-                    <td>TRX-00124</td>
-                    <td>To Kill a Mockingbird</td>
-                    <td>Emma Johnson</td>
-                    <td>2023-07-19</td>
-                    <td>2023-08-02</td>
-                    <td><span className="badge bg-success">Returned</span></td>
-                  </tr>
-                  <tr>
-                    <td>TRX-00123</td>
-                    <td>1984</td>
-                    <td>Michael Brown</td>
-                    <td>2023-07-18</td>
-                    <td>2023-07-25</td>
-                    <td><span className="badge bg-danger">Overdue</span></td>
-                  </tr>
+                  {borrows.map((b) => (
+                      <tr key={b.id}>
+                        <td>{b.trxNumber}</td>
+                        <td>{b.book?.title}</td>
+                        <td>{b.member?.userFirstName} {b.member?.userLastName}</td>
+                        <td>{new Date(b.issuedAt).toLocaleDateString()}</td>
+                        <td>{new Date(b.dueAt).toLocaleDateString()}</td>
+                        <td>
+                          {b.status === "BORROWED" && (
+                            <span className="badge bg-warning">Borrowed</span>
+                          )}
+                          {b.status === "RETURNED" && (
+                            <span className="badge bg-success">Returned</span>
+                          )}
+                          {b.status === "BORROWED" && new Date(b.dueAt) < new Date() && (
+                            <span className="badge bg-danger">Overdue</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>

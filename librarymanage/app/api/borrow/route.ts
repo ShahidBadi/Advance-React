@@ -10,10 +10,10 @@ export async function GET(req: Request) {
     const userCookie = cookiestore.get("userid");  // <-- returns Cookie | undefined
     const memberId = userCookie?.value;   
   try {
-    const borrows = await prisma.borrow.findMany({
-      where: { memberId },
-      include: { book: true },
-      orderBy: { borrowedAt: "desc" },
+    const borrows = await prisma.transaction.findMany({
+      where: { memberId,status:"BORROWED"},
+      include: { book: true,member:true },
+      orderBy: { issuedAt: "desc" },
     });
 
     return NextResponse.json({ borrows });
@@ -50,20 +50,21 @@ export async function POST(req: Request) {
     }
 
     // ✅ Create borrow record
-    const borrow = await prisma.borrow.create({
+    const borrow = await prisma.transaction.create({
       data: {
+        trxNumber: "TRX-" + Math.floor(Math.random() * 100000),
         member: { connect: { id: memberId } },
         book: { connect: { id: bookId } },
-        dueDate: new Date(dueDate),
-        borrowedAt: new Date(),
+        dueAt: new Date(dueDate),
+        issuedAt: new Date(),
       },
     });
 
     // ✅ Decrease available count
-    await prisma.book.update({
-      where: { id: bookId },
-      data: { available: { decrement: 1 } },
-    });
+    // await prisma.book.update({
+    //   where: { id: bookId },
+    //   data: { available: { decrement: 1 } },
+    // });
 
     // ✅ Optional: update any pending reservation for this book to COMPLETED
     await prisma.reservation.updateMany({

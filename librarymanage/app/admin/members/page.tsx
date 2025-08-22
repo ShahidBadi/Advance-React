@@ -10,7 +10,8 @@ interface Member {
   userName: string;
   userEmail: string;
   userType: string;
-  status?: string;
+  // status?: string;
+  isBlocked:Boolean;
 }
 
 export default function MembersPage() {
@@ -24,7 +25,7 @@ export default function MembersPage() {
     Email: "",
     Password: "",
     UserType: "Standard",
-    Status: "Active",
+    // Status: "Active",
   });
 
   const closeRef = useRef<HTMLButtonElement | null>(null);
@@ -35,6 +36,7 @@ export default function MembersPage() {
       const res = await fetch("/api/member");
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
+
       setMembers(data);
     } catch (err) {
       console.error("Failed to fetch members:", err);
@@ -72,7 +74,7 @@ export default function MembersPage() {
           userEmail: form.Email,
           userPassword: form.Password,
           userType: form.UserType,
-          status: form.Status,
+          // status: form.Status,
         }),
       });
 
@@ -89,7 +91,7 @@ export default function MembersPage() {
           Email: "",
           Password: "",
           UserType: "Admin",
-          Status: "Active",
+          // Status: "Active",
         });
         await fetchMembers();
       }
@@ -110,7 +112,7 @@ export default function MembersPage() {
       Email: member.userEmail,
       Password: "",
       UserType: member.userType,
-      Status: member.status || "Active",
+      
     });
   };
 
@@ -128,7 +130,7 @@ export default function MembersPage() {
         userEmail: form.Email,
         ...(form.Password && { userPassword: form.Password }), // update only if entered
         userType: form.UserType,
-        status: form.Status,
+        // status: form.Status,
       }),
     });
 
@@ -146,6 +148,23 @@ export default function MembersPage() {
       await fetch(`/api/member/${id}`, { method: "DELETE" });
       fetchMembers();
     }
+  };
+  const blockuser=async (id:string)=>{
+    await fetch("/api/admin/block",{
+      method:"POST",
+      headers:{"Content-Type": "application/json" },
+      body:JSON.stringify({userId:id})
+    });
+    fetchMembers();
+  }
+
+   const unblockUser = async (id: string) => {
+    await fetch("/api/admin/block", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: id }),
+    });
+    fetchMembers();
   };
 
   return (
@@ -176,6 +195,7 @@ export default function MembersPage() {
                   <th>User Type</th>
                   <th>Status</th>
                   <th>Actions</th>
+                  <th>Function</th>
                 </tr>
               </thead>
               <tbody>
@@ -186,7 +206,7 @@ export default function MembersPage() {
                     <td>{member.userEmail}</td>
                     <td>{member.userType}</td>
                     <td>
-                      <span
+                      {/* <span
                         className={`badge ${
                           member.status === "Active"
                             ? "bg-success"
@@ -194,7 +214,28 @@ export default function MembersPage() {
                         }`}
                       >
                         {member.status || "Active"}
-                      </span>
+                      </span> */}
+                      {member.isBlocked?"Blocked":"Active"}
+                    </td>
+                    <td>
+                    {member.isBlocked?(
+                      <button
+                      onClick={()=>{unblockUser(member.id)}}
+                    className="bg-green-600 text-white px-3 py-1 rounded"
+                    style={{backgroundColor:"green"}}
+                  >
+                    Unblock
+                  </button>
+                  ):(
+                  <button
+                  onClick={()=>{blockuser(member.id)}}
+                    className="bg-red-600 text-white px-3 py-1 rounded"
+                    style={{backgroundColor:"red"}}
+                  >
+                    Block
+                  </button>
+
+                    )}
                     </td>
                     <td>
                       <button
@@ -315,7 +356,7 @@ export default function MembersPage() {
                     <option>Student</option>
                   </select>
                 </div>
-                <div className="mb-3">
+                {/* <div className="mb-3">
                   <label className="form-label">Status</label>
                   <select
                     className="form-select"
@@ -326,7 +367,7 @@ export default function MembersPage() {
                     <option>Active</option>
                     <option>Inactive</option>
                   </select>
-                </div>
+                </div> */}
                 <div className="modal-footer">
                   <button
                     type="button"
@@ -431,7 +472,7 @@ export default function MembersPage() {
                     <option>Student</option>
                   </select>
                 </div>
-                <div className="mb-3">
+                {/* <div className="mb-3">
                   <label className="form-label">Status</label>
                   <select
                     className="form-select"
@@ -442,7 +483,7 @@ export default function MembersPage() {
                     <option>Active</option>
                     <option>Inactive</option>
                   </select>
-                </div>
+                </div> */}
               </form>
             </div>
             <div className="modal-footer">
