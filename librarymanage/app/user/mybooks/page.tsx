@@ -167,13 +167,13 @@ export default function MyBooksPage() {
                           <button className="btn btn-sm btn-outline-info" onClick={()=>{handleRenew(b.id)}}>
                             <i className="bi bi-arrow-repeat"></i> Renew
                           </button>
-                          <button
+                          {/* <button
                           onClick={()=>{handleReturn(b.id)}}
                             className="btn btn-sm btn-outline-danger"
                             style={{marginLeft:5}}
                           >
                             <i className="bi bi-box-arrow-left"></i> Return
-                          </button>
+                          </button> */}
                         </td>
                       </tr>
                     ))}

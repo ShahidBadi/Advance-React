@@ -32,41 +32,43 @@ enum ReservationStatus {
 /// Models
 
 model User {
-  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  id                 String          @id @default(auto()) @map("_id") @db.ObjectId
   userFirstName      String
   userLastName       String
-  userName           String    @unique
-  userEmail          String    @unique
+  userName           String          @unique
+  userEmail          String          @unique
   userPassword       String
-  userType           UserType 
-  membershipDate     DateTime  @default(now())
-  isBlocked          Boolean   @default(false)
+  userType           UserType
+  membershipDate     DateTime        @default(now())
+  isBlocked          Boolean         @default(false)
+
   // relations
-  transactions       Transaction[] 
+  transactions       Transaction[]
   reservations       Reservation[]
   borrows            Borrow[]
+  notifications      Notification[]  @relation("UserNotifications")
 
   // admin / audit
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
 }
 
-  model Book {
-    id           String    @id @default(auto()) @map("_id") @db.ObjectId
-    title        String
-    author       String
-    isbn         String? 
-    type         String?   // e.g. "Fiction", "Reference"
-    quantity     Int      @default(1)
-    available    Int       @default(1)
-    createdAt    DateTime  @default(now())
-    updatedAt    DateTime  @updatedAt
+model Book {
+  id           String          @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  author       String
+  isbn         String?
+  type         String?          // e.g. "Fiction", "Reference"
+  quantity     Int              @default(1)
+  available    Int              @default(1)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
 
-    // relations
-    transactions Transaction[]
-    reservations Reservation[]
-    borrows Borrow[]
-  }
+  // relations
+  transactions Transaction[]
+  reservations Reservation[]
+  borrows      Borrow[]
+}
 
 model Transaction {
   id            String            @id @default(auto()) @map("_id") @db.ObjectId
@@ -78,13 +80,15 @@ model Transaction {
   status        TransactionStatus @default(BORROWED)
   issuedAt      DateTime          @default(now())
   dueAt         DateTime
-  returnedAt    DateTime? 
+  returnedAt    DateTime?
   renewedCount  Int               @default(0)
   fineAmount    Float?            @default(0.0)
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
 
-  // Useful indexes (only when not duplicating an existing @unique/@id index)
+  notifications Notification[]    @relation("TransactionNotifications")
+
+  // Useful indexes
   @@index([memberId])
   @@index([bookId])
 }
@@ -117,7 +121,22 @@ model Borrow {
   returnedAt DateTime?
   status     String   @default("BORROWED") // BORROWED | RETURNED | OVERDUE
 
-   @@index([bookId])
+  @@index([bookId])
   @@index([memberId])
 }
 
+model Notification {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  type          String       // e.g. "RENEW_REQUEST", "RETURN_REQUEST"
+  message       String       // Text to display in admin notifications
+  status        String       @default("PENDING") // PENDING | APPROVED | REJECTED | READ
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  memberId      String
+  member        User         @relation("UserNotifications", fields: [memberId], references: [id])
+
+  transactionId String
+  transaction   Transaction  @relation("TransactionNotifications", fields: [transactionId], references: [id])
+}

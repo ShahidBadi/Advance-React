@@ -2,17 +2,17 @@ import { PrismaClient } from "@/app/generated/prisma";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-const prisma=new PrismaClient();
+const prisma = new PrismaClient();
 
 // 📌 GET: fetch all borrowed books
 export async function GET(req: Request) {
-    const cookiestore=await cookies();
-    const userCookie = cookiestore.get("userid");  // <-- returns Cookie | undefined
-    const memberId = userCookie?.value;   
+  const cookiestore = await cookies();
+  const userCookie = cookiestore.get("userid");  // <-- returns Cookie | undefined
+  const memberId = userCookie?.value;
   try {
     const borrows = await prisma.transaction.findMany({
-      where: { memberId,status:"BORROWED"},
-      include: { book: true,member:true },
+      where: { memberId, status: "BORROWED" },
+      include: { book: true, member: true },
       orderBy: { issuedAt: "desc" },
     });
 
@@ -26,14 +26,8 @@ export async function GET(req: Request) {
 // 📌 POST: checkout → add new borrowed book
 export async function POST(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const memberId = cookieStore.get("userid")?.value;
-
-    if (!memberId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { bookId, dueDate } = await req.json();
+    const { bookId, memberId, dueAt } = await req.json();
+    console.log("entered in borrow api")
 
     if (!bookId) {
       return NextResponse.json({ error: "Book ID is required" }, { status: 400 });
@@ -55,7 +49,7 @@ export async function POST(req: Request) {
         trxNumber: "TRX-" + Math.floor(Math.random() * 100000),
         member: { connect: { id: memberId } },
         book: { connect: { id: bookId } },
-        dueAt: new Date(dueDate),
+        dueAt: new Date(dueAt),
         issuedAt: new Date(),
       },
     });

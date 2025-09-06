@@ -1,349 +1,1242 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LibraTech - My Books</title>
-
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <style>
-    :root{
-      --bg:#0f1112;
-      --panel:#17191a;
-      --muted:#9aa0a6;
-      --accent:#00b894;
-      --card-border: rgba(255,255,255,0.06);
-    }
-    body{
-      background: var(--bg);
-      color: #e6eef2;
-      font-family: Inter, system-ui, Arial, sans-serif;
-    }
-
-    /* Sidebar */
-    .app-sidebar{
-      width: 240px;
-      background: #0b0c0d;
-      min-height: 100vh;
-      border-right: 1px solid rgba(255,255,255,0.03);
-      padding: 1.5rem 1rem;
-      position: fixed;
-      top:0; left:0;
-    }
-    .app-sidebar .logo{
-      font-weight:700;
-      font-size:1.25rem;
-      color: #34a0ff;
-      margin-bottom:1.25rem;
-    }
-    .nav-link{
-      color: var(--muted);
-      padding: .65rem .5rem;
-      border-radius: .5rem;
-      display:flex;
-      gap:.75rem;
-      align-items:center;
-    }
-    .nav-link.active, .nav-link:hover{
-      background: rgba(255,255,255,0.03);
-      color: #fff;
-    }
-
-    /* Main content area */
-    .main-wrap{
-      margin-left: 240px;
-      padding: 2rem;
-    }
-    .topbar{
-      height:64px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:1rem;
-      padding-right:1rem;
-    }
-    .page-title{
-      font-size:2rem;
-      font-weight:700;
-      margin-bottom:1rem;
-    }
-
-    /* Panels */
-    .panel{
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border: 1px solid var(--card-border);
-      border-radius: .6rem;
-      padding: 1.1rem;
-      margin-bottom: 1.25rem;
-    }
-    .panel .panel-title{
-      font-weight:700;
-      font-size:1.05rem;
-      margin-bottom:.75rem;
-    }
-
-    /* Table tweaks */
-    .table thead th { color: #cdd7db; border-bottom:1px solid rgba(255,255,255,0.06); }
-    .table tbody td { vertical-align: middle; border-top:1px solid rgba(255,255,255,0.03); color:#dbe7ea; }
-    .book-thumb{ width:46px; height:60px; object-fit:cover; border-radius:.35rem; background:#222; display:inline-block; }
-    .book-title{ font-weight:700; color:#fff; }
-    .book-author{ display:block; font-size:.85rem; color:var(--muted); }
-
-    /* Badges & actions */
-    .badge-available{ background:#128a5e; color:#fff; padding:.35rem .6rem; border-radius:999px; font-weight:600; font-size:.82rem; }
-    .badge-borrowed{ background:#a77b1a; color:#fff; padding:.35rem .6rem; border-radius:999px; font-weight:600; font-size:.82rem; }
-    .btn-outline-accent{
-      border-color: rgba(52,160,255,0.12);
-      color: #38bdf8;
-      background: transparent;
-      border-radius:.45rem;
-      padding:.3rem .6rem;
-    }
-
-    /* Right sidebar */
-    .right-col .card{
-      background: transparent;
-      border: 1px solid var(--card-border);
-      border-radius:.6rem;
-      padding:1rem;
-      margin-bottom:1rem;
-    }
-    .summary-key { color: var(--muted); }
-    .summary-value { font-weight:700; color:#fff; }
-
-    /* progress bars (custom colors) */
-    .progress { height:10px; background: rgba(255,255,255,0.03); border-radius:10px; }
-    .progress-bar { border-radius:10px; }
-
-    /* responsive */
-    @media (max-width: 991px){
-      .app-sidebar{ position:relative; width:100%; min-height:auto; display:flex; gap:1rem; align-items:center; padding: .75rem;}
-      .main-wrap{ margin-left:0; padding:1rem; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --dark-bg: #121212;
+            --darker-bg: #0d0d0d;
+            --card-bg: #1e1e1e;
+            --accent-color: #0d6efd;
+            --text-light: #f8f9fa;
+            --text-muted: #adb5bd;
+            --success: #198754;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .sidebar {
+            background-color: var(--darker-bg);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            overflow-y: auto;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-sticky {
+            position: relative;
+            top: 0;
+            height: calc(100vh - 48px);
+            padding-top: 0.5rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .navbar {
+            background-color: var(--darker-bg);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid #333;
+            color: var(--text-light);
+        }
+        
+        .table-dark {
+            --bs-table-bg: var(--card-bg);
+            --bs-table-striped-bg: #1a1a1a;
+            --bs-table-hover-bg: #2a2a2a;
+            border-color: #444;
+        }
+        
+        .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+            background-color: var(--accent-color);
+        }
+        
+        .nav-link {
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .stat-card {
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .user-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-color);
+        }
+        
+        .page-section {
+            display: none;
+        }
+        
+        .page-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+        
+        .logo span {
+            color: var(--accent-color);
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .available {
+            background-color: rgba(25, 135, 84, 0.2);
+            color: var(--success);
+        }
+        
+        .borrowed {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: var(--warning);
+        }
+        
+        .overdue {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--danger);
+        }
+        
+        .active-member {
+            background-color: rgba(13, 110, 253, 0.2);
+            color: var(--accent-color);
+        }
+        
+        .form-control, .form-select {
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            color: var(--text-light);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: #2a2a2a;
+            color: var(--text-light);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        
+        .btn-action {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        .page-title {
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-container {
+            height: 300px;
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .progress {
+            background-color: #2a2a2a;
+            height: 8px;
+        }
+    </style>
 </head>
 <body>
-
-  <!-- Sidebar -->
-  <aside class="app-sidebar">
-    <div class="logo">📚 <span style="color:#34a0ff">Libra</span>Tech</div>
-
-    <nav class="nav flex-column">
-      <a class="nav-link active" href="#"><i class="bi bi-speedometer2"></i> Dashboard</a>
-      <a class="nav-link" href="#"><i class="bi bi-book"></i> Browse Books</a>
-      <a class="nav-link" href="#"><i class="bi bi-journal-bookmark"></i> My Books</a>
-      <a class="nav-link" href="#"><i class="bi bi-person-circle"></i> My Profile</a>
-    </nav>
-  </aside>
-
-  <!-- Main content -->
-  <main class="main-wrap">
-    <div class="topbar">
-      <div class="page-title">My Books</div>
-      <div>
-        <!-- optional search / user menu -->
-      </div>
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column flex-shrink-0 p-3" style="width: 250px;">
+        <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+            <span class="logo"><i class="bi bi-book me-2"></i>Libra<span>Tech</span></span>
+        </div>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" data-target="dashboard">
+                    <i class="bi bi-speedometer2 me-2"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link" data-target="books">
+                    <i class="bi bi-book me-2"></i>
+                    Books
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link" data-target="members">
+                    <i class="bi bi-people me-2"></i>
+                    Members
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link" data-target="transactions">
+                    <i class="bi bi-arrow-left-right me-2"></i>
+                    Transactions
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link" data-target="reports">
+                    <i class="bi bi-bar-chart me-2"></i>
+                    Reports
+                </a>
+            </li>
+        </ul>
+        <hr>
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="https://via.placeholder.com/40" alt="" width="40" height="40" class="rounded-circle me-2">
+                <strong>Admin</strong>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                <li><a class="dropdown-item" href="#" data-target="profile">Profile</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">Sign out</a></li>
+            </ul>
+        </div>
     </div>
 
-    <div class="row g-4">
-      <!-- left column -->
-      <div class="col-lg-8">
-        <!-- Currently Borrowed -->
-        <div class="panel">
-          <div class="panel-title">Currently Borrowed</div>
-
-          <div class="table-responsive">
-            <table class="table align-middle mb-0">
-              <thead>
-                <tr>
-                  <th scope="col">Book</th>
-                  <th scope="col">Borrow Date</th>
-                  <th scope="col">Due Date</th>
-                  <th scope="col">Status</th>
-                  <th scope="col" class="text-end">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Row 1 -->
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center gap-3">
-                      <img src="https://via.placeholder.com/46x60?text=Cover" alt="cover" class="book-thumb">
-                      <div>
-                        <div class="book-title">The Great Gatsby</div>
-                        <div class="book-author">F. Scott Fitzgerald</div>
-                      </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navigation -->
+        <nav class="navbar navbar-expand navbar-dark sticky-top mb-4">
+            <div class="container-fluid">
+                <button class="btn btn-sm btn-outline-secondary d-md-none" type="button">
+                    <i class="bi bi-list"></i>
+                </button>
+                
+                <div class="d-flex ms-auto align-items-center">
+                    <div class="input-group me-3" style="width: 300px;">
+                        <input type="text" class="form-control" placeholder="Search...">
+                        <button class="btn btn-outline-light" type="button">
+                            <i class="bi bi-search"></i>
+                        </button>
                     </div>
-                  </td>
-                  <td>Jul 20, 2023</td>
-                  <td>Aug 15, 2023</td>
-                  <td><span class="badge-available">Borrowed</span></td>
-                  <td class="text-end">
-                    <button class="btn btn-sm btn-outline-accent"><i class="bi bi-arrow-repeat"></i> Renew</button>
-                  </td>
-                </tr>
-
-                <!-- Row 2 -->
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center gap-3">
-                      <img src="https://via.placeholder.com/46x60?text=Cover" alt="cover" class="book-thumb">
-                      <div>
-                        <div class="book-title">To Kill a Mockingbird</div>
-                        <div class="book-author">Harper Lee</div>
-                      </div>
+                    
+                    <div class="dropdown">
+                        <a href="#" class="d-block link-light text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="https://via.placeholder.com/32" alt="user" width="32" height="32" class="rounded-circle">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser">
+                            <li><a class="dropdown-item" href="#" data-target="profile">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Sign out</a></li>
+                        </ul>
                     </div>
-                  </td>
-                  <td>Jul 22, 2023</td>
-                  <td>Aug 18, 2023</td>
-                  <td><span class="badge-borrowed">Borrowed</span></td>
-                  <td class="text-end">
-                    <button class="btn btn-sm btn-outline-accent"><i class="bi bi-arrow-repeat"></i> Renew</button>
-                  </td>
-                </tr>
+                </div>
+            </div>
+        </nav>
 
-                <!-- Row 3 -->
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center gap-3">
-                      <img src="https://via.placeholder.com/46x60?text=Cover" alt="cover" class="book-thumb">
-                      <div>
-                        <div class="book-title">1984</div>
-                        <div class="book-author">George Orwell</div>
-                      </div>
+        <!-- Page Sections -->
+        <!-- Dashboard -->
+        <div id="dashboard" class="page-section active">
+            <h2 class="page-title">Dashboard</h2>
+            
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card stat-card border-start border-4 border-primary">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-uppercase text-muted">Total Books</h6>
+                                    <h2 class="mb-0">8,542</h2>
+                                </div>
+                                <div class="icon-shape bg-primary text-white rounded-circle p-3">
+                                    <i class="bi bi-book fs-3"></i>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-success">
+                                <i class="bi bi-arrow-up"></i>
+                                <span>120 new this month</span>
+                            </p>
+                        </div>
                     </div>
-                  </td>
-                  <td>Jul 25, 2023</td>
-                  <td>Aug 10, 2023</td>
-                  <td><span class="badge-available">Borrowed</span></td>
-                  <td class="text-end">
-                    <button class="btn btn-sm btn-outline-accent"><i class="bi bi-arrow-repeat"></i> Renew</button>
-                  </td>
-                </tr>
-
-              </tbody>
-            </table>
-          </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card stat-card border-start border-4 border-success">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-uppercase text-muted">Active Members</h6>
+                                    <h2 class="mb-0">1,248</h2>
+                                </div>
+                                <div class="icon-shape bg-success text-white rounded-circle p-3">
+                                    <i class="bi bi-people fs-3"></i>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-success">
+                                <i class="bi bi-arrow-up"></i>
+                                <span>42 new this month</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card stat-card border-start border-4 border-warning">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-uppercase text-muted">Borrowed Books</h6>
+                                    <h2 class="mb-0">2,154</h2>
+                                </div>
+                                <div class="icon-shape bg-warning text-white rounded-circle p-3">
+                                    <i class="bi bi-arrow-up-right-circle fs-3"></i>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-danger">
+                                <i class="bi bi-arrow-down"></i>
+                                <span>12 overdue</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card stat-card border-start border-4 border-danger">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-uppercase text-muted">Overdue Books</h6>
+                                    <h2 class="mb-0">47</h2>
+                                </div>
+                                <div class="icon-shape bg-danger text-white rounded-circle p-3">
+                                    <i class="bi bi-exclamation-triangle fs-3"></i>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 text-warning">
+                                <i class="bi bi-clock"></i>
+                                <span>7 days average</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Recent Transactions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-dark table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Book</th>
+                                            <th>Member</th>
+                                            <th>Date</th>
+                                            <th>Due Date</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>TRX-00125</td>
+                                            <td>The Great Gatsby</td>
+                                            <td>John Smith</td>
+                                            <td>2023-07-20</td>
+                                            <td>2023-08-03</td>
+                                            <td><span class="status-badge borrowed">Borrowed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>TRX-00124</td>
+                                            <td>To Kill a Mockingbird</td>
+                                            <td>Emma Johnson</td>
+                                            <td>2023-07-19</td>
+                                            <td>2023-08-02</td>
+                                            <td><span class="status-badge available">Returned</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>TRX-00123</td>
+                                            <td>1984</td>
+                                            <td>Michael Brown</td>
+                                            <td>2023-07-18</td>
+                                            <td>2023-07-25</td>
+                                            <td><span class="status-badge overdue">Overdue</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>TRX-00122</td>
+                                            <td>Pride and Prejudice</td>
+                                            <td>Sarah Davis</td>
+                                            <td>2023-07-17</td>
+                                            <td>2023-07-31</td>
+                                            <td><span class="status-badge borrowed">Borrowed</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>TRX-00121</td>
+                                            <td>The Hobbit</td>
+                                            <td>Robert Wilson</td>
+                                            <td>2023-07-16</td>
+                                            <td>2023-07-30</td>
+                                            <td><span class="status-badge available">Returned</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Book Categories</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Fiction</span>
+                                    <span>42%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 42%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Non-Fiction</span>
+                                    <span>28%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 28%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Science</span>
+                                    <span>15%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 15%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>History</span>
+                                    <span>8%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: 8%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Biography</span>
+                                    <span>7%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 7%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <!-- My Reservations -->
-        <div class="panel">
-          <div class="panel-title">My Reservations</div>
-
-          <div class="table-responsive">
-            <table class="table align-middle mb-0">
-              <thead>
-                <tr>
-                  <th>Book</th>
-                  <th>Reservation Date</th>
-                  <th>Status</th>
-                  <th class="text-end">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center gap-3">
-                      <img src="https://via.placeholder.com/46x60?text=Cover" alt="cover" class="book-thumb">
-                      <div>
-                        <div class="book-title">Harry Potter</div>
-                        <div class="book-author">J.K. Rowling</div>
-                      </div>
+        
+        <!-- Books -->
+        <div id="books" class="page-section">
+            <h2 class="page-title">Books Management</h2>
+            
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Book Inventory</h5>
+                    <button class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i> Add New Book
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Category</th>
+                                    <th>ISBN</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>BK-00125</td>
+                                    <td>The Great Gatsby</td>
+                                    <td>F. Scott Fitzgerald</td>
+                                    <td>Fiction</td>
+                                    <td>978-0743273565</td>
+                                    <td><span class="status-badge borrowed">Borrowed</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1 btn-action">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger btn-action">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>BK-00124</td>
+                                    <td>To Kill a Mockingbird</td>
+                                    <td>Harper Lee</td>
+                                    <td>Fiction</td>
+                                    <td>978-0061120084</td>
+                                    <td><span class="status-badge available">Available</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1 btn-action">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger btn-action">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>BK-00123</td>
+                                    <td>1984</td>
+                                    <td>George Orwell</td>
+                                    <td>Fiction</td>
+                                    <td>978-0451524935</td>
+                                    <td><span class="status-badge available">Available</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1 btn-action">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger btn-action">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>BK-00122</td>
+                                    <td>Pride and Prejudice</td>
+                                    <td>Jane Austen</td>
+                                    <td>Fiction</td>
+                                    <td>978-0141439518</td>
+                                    <td><span class="status-badge borrowed">Borrowed</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1 btn-action">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger btn-action">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>BK-00121</td>
+                                    <td>The Hobbit</td>
+                                    <td>J.R.R. Tolkien</td>
+                                    <td>Fantasy</td>
+                                    <td>978-0547928227</td>
+                                    <td><span class="status-badge available">Available</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1 btn-action">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger btn-action">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                  </td>
-                  <td>Jul 28, 2023</td>
-                  <td><span class="badge-available" style="background:#1f8f69">Ready for pickup</span></td>
-                  <td class="text-end">
-                    <button class="btn btn-sm btn-success">Checkout</button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center gap-3">
-                      <img src="https://via.placeholder.com/46x60?text=Cover" alt="cover" class="book-thumb">
-                      <div>
-                        <div class="book-title">The Alchemist</div>
-                        <div class="book-author">Paulo Coelho</div>
-                      </div>
+                    
+                    <nav>
+                        <ul class="pagination justify-content-end">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">Previous</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Members -->
+        <div id="members" class="page-section">
+            <h2 class="page-title">Members Management</h2>
+            
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Library Members</h5>
+                    <button class="btn btn-primary">
+                        <i class="bi bi-person-plus me-1"></i> Add New Member
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Membership</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>M-00125</td>
+                                    <td>John Smith</td>
+                                    <td>john@example.com</td>
+                                    <td>(555) 123-4567</td>
+                                    <td>Premium</td>
+                                    <td><span class="status-badge active-member">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1 btn-action">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-info me-1 btn-action">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger btn-action">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>M-00124</td>
+                                    <td>Emma Johnson</td>
+                                    <td>emma@example.com</td>
+                                    <td>(555) 987-6543</td>
+                                    <td>Standard</td>
+                                    <td><span class="status-badge active-member">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1 btn-action">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-info me-1 btn-action">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger btn-action">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>M-00123</td>
+                                    <td>Michael Brown</td>
+                                    <td>michael@example.com</td>
+                                    <td>(555) 456-7890</td>
+                                    <td>Premium</td>
+                                    <td><span class="status-badge overdue">Suspended</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1 btn-action">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-info me-1 btn-action">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger btn-action">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>M-00122</td>
+                                    <td>Sarah Davis</td>
+                                    <td>sarah@example.com</td>
+                                    <td>(555) 789-0123</td>
+                                    <td>Standard</td>
+                                    <td><span class="status-badge active-member">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1 btn-action">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-info me-1 btn-action">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger btn-action">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>M-00121</td>
+                                    <td>Robert Wilson</td>
+                                    <td>robert@example.com</td>
+                                    <td>(555) 234-5678</td>
+                                    <td>Standard</td>
+                                    <td><span class="status-badge active-member">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1 btn-action">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-info me-1 btn-action">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger btn-action">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                  </td>
-                  <td>Aug 01, 2023</td>
-                  <td><span class="badge-borrowed" style="background:#b07b1b">Waiting list: #2</span></td>
-                  <td class="text-end">
-                    <button class="btn btn-sm btn-outline-danger">Cancel</button>
-                  </td>
-                </tr>
-
-              </tbody>
-            </table>
-          </div>
+                    
+                    <nav>
+                        <ul class="pagination justify-content-end">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">Previous</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
         </div>
-
-      </div>
-
-      <!-- right column -->
-      <div class="col-lg-4 right-col">
-        <div class="card">
-          <div class="panel-title">Borrowing Summary</div>
-          <div class="mt-3">
-            <div class="d-flex justify-content-between">
-              <div class="summary-key">Total Books Borrowed</div>
-              <div class="summary-value">42</div>
+        
+        <!-- Transactions -->
+        <div id="transactions" class="page-section">
+            <h2 class="page-title">Transactions</h2>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Borrow a Book</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Member</label>
+                                    <select class="form-select">
+                                        <option selected>Select a member</option>
+                                        <option>John Smith (M-00125)</option>
+                                        <option>Emma Johnson (M-00124)</option>
+                                        <option>Michael Brown (M-00123)</option>
+                                        <option>Sarah Davis (M-00122)</option>
+                                        <option>Robert Wilson (M-00121)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Book</label>
+                                    <select class="form-select">
+                                        <option selected>Select a book</option>
+                                        <option>The Great Gatsby (BK-00125)</option>
+                                        <option>To Kill a Mockingbird (BK-00124)</option>
+                                        <option>1984 (BK-00123)</option>
+                                        <option>Pride and Prejudice (BK-00122)</option>
+                                        <option>The Hobbit (BK-00121)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Due Date</label>
+                                    <input type="date" class="form-control">
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Process Borrow</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Return a Book</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Transaction ID</label>
+                                    <input type="text" class="form-control" placeholder="Enter transaction ID">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Condition</label>
+                                    <select class="form-select">
+                                        <option selected>Select condition</option>
+                                        <option>Excellent</option>
+                                        <option>Good</option>
+                                        <option>Fair</option>
+                                        <option>Damaged</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Notes</label>
+                                    <textarea class="form-control" rows="2" placeholder="Any additional notes"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100">Process Return</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="d-flex justify-content-between mt-2">
-              <div class="summary-key">Late Returns</div>
-              <div class="summary-value text-danger">2</div>
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Transaction History</h5>
+                    <div>
+                        <select class="form-select form-select-sm d-inline-block w-auto">
+                            <option>All Transactions</option>
+                            <option>Borrowed</option>
+                            <option>Returned</option>
+                            <option>Overdue</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Book</th>
+                                    <th>Member</th>
+                                    <th>Borrow Date</th>
+                                    <th>Due Date</th>
+                                    <th>Return Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>TRX-00125</td>
+                                    <td>The Great Gatsby</td>
+                                    <td>John Smith</td>
+                                    <td>2023-07-20</td>
+                                    <td>2023-08-03</td>
+                                    <td>-</td>
+                                    <td><span class="status-badge borrowed">Borrowed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>TRX-00124</td>
+                                    <td>To Kill a Mockingbird</td>
+                                    <td>Emma Johnson</td>
+                                    <td>2023-07-19</td>
+                                    <td>2023-08-02</td>
+                                    <td>2023-07-25</td>
+                                    <td><span class="status-badge available">Returned</span></td>
+                                </tr>
+                                <tr>
+                                    <td>TRX-00123</td>
+                                    <td>1984</td>
+                                    <td>Michael Brown</td>
+                                    <td>2023-07-18</td>
+                                    <td>2023-07-25</td>
+                                    <td>-</td>
+                                    <td><span class="status-badge overdue">Overdue</span></td>
+                                </tr>
+                                <tr>
+                                    <td>TRX-00122</td>
+                                    <td>Pride and Prejudice</td>
+                                    <td>Sarah Davis</td>
+                                    <td>2023-07-17</td>
+                                    <td>2023-07-31</td>
+                                    <td>-</td>
+                                    <td><span class="status-badge borrowed">Borrowed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>TRX-00121</td>
+                                    <td>The Hobbit</td>
+                                    <td>Robert Wilson</td>
+                                    <td>2023-07-16</td>
+                                    <td>2023-07-30</td>
+                                    <td>2023-07-24</td>
+                                    <td><span class="status-badge available">Returned</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <div class="d-flex justify-content-between mt-2">
-              <div class="summary-key">Renewals This Year</div>
-              <div class="summary-value">8</div>
-            </div>
-            <div class="d-flex justify-content-between mt-2">
-              <div class="summary-key">Favorite Category</div>
-              <div class="summary-value">Fiction</div>
-            </div>
-            <div class="d-flex justify-content-between mt-2">
-              <div class="summary-key">Member Since</div>
-              <div class="summary-value">Jan 15, 2022</div>
-            </div>
-          </div>
         </div>
-
-        <div class="card">
-          <div class="panel-title">Borrowing Limits</div>
-          <div class="mt-3">
-            <div class="small text-muted">Books Borrowed <span class="float-end">3/5</span></div>
-            <div class="progress mb-3">
-              <div class="progress-bar" role="progressbar" style="width:60%"></div>
+        
+        <!-- Reports -->
+        <div id="reports" class="page-section">
+            <h2 class="page-title">Reports & Analytics</h2>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Monthly Activity</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container d-flex align-items-center justify-content-center">
+                                <div class="text-center">
+                                    <i class="bi bi-bar-chart fs-1 text-primary"></i>
+                                    <p class="mt-2">Activity chart would appear here</p>
+                                    <small class="text-muted">(Requires JavaScript to display)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Top Borrowed Books</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item bg-transparent text-light d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">The Great Gatsby</h6>
+                                        <small class="text-muted">F. Scott Fitzgerald</small>
+                                    </div>
+                                    <span class="badge bg-primary">42 borrows</span>
+                                </li>
+                                <li class="list-group-item bg-transparent text-light d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">To Kill a Mockingbird</h6>
+                                        <small class="text-muted">Harper Lee</small>
+                                    </div>
+                                    <span class="badge bg-primary">38 borrows</span>
+                                </li>
+                                <li class="list-group-item bg-transparent text-light d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">1984</h6>
+                                        <small class="text-muted">George Orwell</small>
+                                    </div>
+                                    <span class="badge bg-primary">35 borrows</span>
+                                </li>
+                                <li class="list-group-item bg-transparent text-light d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Pride and Prejudice</h6>
+                                        <small class="text-muted">Jane Austen</small>
+                                    </div>
+                                    <span class="badge bg-primary">29 borrows</span>
+                                </li>
+                                <li class="list-group-item bg-transparent text-light d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">The Hobbit</h6>
+                                        <small class="text-muted">J.R.R. Tolkien</small>
+                                    </div>
+                                    <span class="badge bg-primary">27 borrows</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div class="small text-muted">Reservations <span class="float-end">2/3</span></div>
-            <div class="progress mb-3">
-              <div class="progress-bar bg-warning" role="progressbar" style="width:66%"></div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Membership Statistics</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="icon-shape bg-primary text-white rounded-circle p-3 me-3">
+                                            <i class="bi bi-people fs-3"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="mb-0">1,248</h4>
+                                            <p class="text-muted mb-0">Total Members</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="icon-shape bg-success text-white rounded-circle p-3 me-3">
+                                            <i class="bi bi-person-check fs-3"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="mb-0">1,098</h4>
+                                            <p class="text-muted mb-0">Active Members</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="icon-shape bg-warning text-white rounded-circle p-3 me-3">
+                                            <i class="bi bi-person-dash fs-3"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="mb-0">87</h4>
+                                            <p class="text-muted mb-0">Inactive Members</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="icon-shape bg-info text-white rounded-circle p-3 me-3">
+                                            <i class="bi bi-person-plus fs-3"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="mb-0">42</h4>
+                                            <p class="text-muted mb-0">New This Month</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Overdue Analysis</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="icon-shape bg-danger text-white rounded-circle p-3 me-3">
+                                    <i class="bi bi-exclamation-triangle fs-3"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-0">47</h4>
+                                    <p class="text-muted mb-0">Overdue Books</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>1-3 days overdue</span>
+                                    <span>32 books</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 68%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>4-7 days overdue</span>
+                                    <span>11 books</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-orange" role="progressbar" style="width: 23%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>More than 7 days</span>
+                                    <span>4 books</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 9%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div class="small text-muted">Renewals Left <span class="float-end">1/2</span></div>
-            <div class="progress mb-3">
-              <div class="progress-bar bg-info" role="progressbar" style="width:50%"></div>
-            </div>
-
-            <div class="small text-muted">Days Until Next Borrow <span class="float-end">0</span></div>
-            <div class="progress">
-              <div class="progress-bar bg-success" role="progressbar" style="width:100%"></div>
-            </div>
-
-          </div>
         </div>
-
-      </div>
+        
+        <!-- Profile -->
+        <div id="profile" class="page-section">
+            <h2 class="page-title">User Profile</h2>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <img src="https://via.placeholder.com/150" class="user-avatar mb-3" alt="User Avatar">
+                            <h4>Admin User</h4>
+                            <p class="text-muted">Library Administrator</p>
+                            
+                            <div class="d-grid gap-2 mt-4">
+                                <button class="btn btn-outline-primary">
+                                    <i class="bi bi-pencil me-1"></i> Edit Profile
+                                </button>
+                                <button class="btn btn-outline-secondary">
+                                    <i class="bi bi-lock me-1"></i> Change Password
+                                </button>
+                            </div>
+                            
+                            <hr class="my-4">
+                            
+                            <h5 class="mb-3">Contact Information</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item bg-transparent text-light d-flex">
+                                    <i class="bi bi-envelope me-2"></i>
+                                    admin@library.com
+                                </li>
+                                <li class="list-group-item bg-transparent text-light d-flex">
+                                    <i class="bi bi-telephone me-2"></i>
+                                    (555) 123-4567
+                                </li>
+                                <li class="list-group-item bg-transparent text-light d-flex">
+                                    <i class="bi bi-geo-alt me-2"></i>
+                                    123 Library St, Bookville
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Account Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">First Name</label>
+                                        <input type="text" class="form-control" value="Admin">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" value="User">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" class="form-control" value="admin_user">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" value="admin@library.com">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Role</label>
+                                    <input type="text" class="form-control" value="Administrator" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">About Me</label>
+                                    <textarea class="form-control" rows="3">Library system administrator with 5+ years of experience managing collections and operations.</textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Profile</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Activity Log</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action bg-transparent text-light">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Added new book</h6>
+                                        <small>2 hours ago</small>
+                                    </div>
+                                    <p class="mb-1">Added "The Catcher in the Rye" to the collection</p>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action bg-transparent text-light">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Processed return</h6>
+                                        <small>Yesterday</small>
+                                    </div>
+                                    <p class="mb-1">Return processed for "To Kill a Mockingbird"</p>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action bg-transparent text-light">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Updated member status</h6>
+                                        <small>2 days ago</small>
+                                    </div>
+                                    <p class="mb-1">Updated membership for John Smith to Premium</p>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action bg-transparent text-light">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Generated report</h6>
+                                        <small>3 days ago</small>
+                                    </div>
+                                    <p class="mb-1">Generated monthly borrowing report for July 2023</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </main>
 
-  <!-- Bootstrap Icons & JS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simple navigation without JavaScript (would require JS for active states)
+        // This minimal JS is only for navigation, as requested
+        document.querySelectorAll('.nav-link, .dropdown-item').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Get target page
+                const target = this.getAttribute('data-target');
+                
+                // Hide all pages
+                document.querySelectorAll('.page-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Show target page
+                document.getElementById(target).classList.add('active');
+                
+                // Update active nav link
+                document.querySelectorAll('.nav-link').forEach(navLink => {
+                    navLink.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>

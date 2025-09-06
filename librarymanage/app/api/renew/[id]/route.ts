@@ -1,13 +1,10 @@
 import { PrismaClient } from "@/app/generated/prisma";
 import { NextResponse } from "next/server";
 
-const prisma=new PrismaClient();
+const prisma = new PrismaClient();
 
-// Example: max renewals allowed
+// Max renewals
 const MAX_RENEWALS = 2;
-
-// Example: extend by 7 days each renewal
-const EXTENSION_DAYS = 7;
 
 export async function PUT(
   req: Request,
@@ -16,9 +13,10 @@ export async function PUT(
   const { id } = params; // transaction ID
 
   try {
-    // Find existing borrow
+    // 1. Find existing transaction
     const transaction = await prisma.transaction.findUnique({
       where: { id },
+      include: { member: true, book: true },
     });
 
     if (!transaction) {
@@ -42,24 +40,25 @@ export async function PUT(
       );
     }
 
-    // Extend due date
-    const newDueDate = new Date(transaction.dueAt);
-    newDueDate.setDate(newDueDate.getDate() + EXTENSION_DAYS);
-
-    const updated = await prisma.transaction.update({
-      where: { id },
+    // 2. Instead of renewing → create a notification
+    await prisma.notification.create({
       data: {
-        dueAt: newDueDate,
-        renewedCount: { increment: 1 },
-        updatedAt: new Date(),
+        type: "RENEW_REQUEST",
+        message: `${transaction.member.userFirstName} ${transaction.member.userLastName} requested renewal for "${transaction.book.title}"`,
+        status: "PENDING",
+        memberId: transaction.memberId,
+        transactionId: transaction.id,
       },
     });
 
-    return NextResponse.json({ success: true, transaction: updated });
+    return NextResponse.json({
+      success: true,
+      message: "Renewal request sent to admin. Waiting for approval.",
+    });
   } catch (error) {
-    console.error("❌ Error renewing book:", error);
+    console.error("❌ Error creating renew request:", error);
     return NextResponse.json(
-      { error: "Failed to renew borrowed book" },
+      { error: "Failed to request renewal" },
       { status: 500 }
     );
   }
