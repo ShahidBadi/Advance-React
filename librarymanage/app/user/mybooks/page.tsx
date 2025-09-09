@@ -57,31 +57,31 @@ export default function MyBooksPage() {
       setBorrows([]);
     }
   };
-  const handleCheckout = async (reservation: Reservation) => {
-    if (!reservation.book?.id) {
-      console.error("Missing bookId in reservation:", reservation);
-      return;
-    }
-    try {
-      const dueDate = new Date();
-      dueDate.setDate(dueDate.getDate() + 14);
+  // const handleCheckout = async (reservation: Reservation) => {
+  //   if (!reservation.book?.id) {
+  //     console.error("Missing bookId in reservation:", reservation);
+  //     return;
+  //   }
+  //   try {
+  //     const dueDate = new Date();
+  //     dueDate.setDate(dueDate.getDate() + 14);
 
-      const res = await fetch("/api/borrow", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bookId: reservation.book.id,
-          dueDate,
-        }),
-      });
+  //     const res = await fetch("/api/borrow", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         bookId: reservation.book.id,
+  //         dueDate,
+  //       }),
+  //     });
 
-      if (!res.ok) throw new Error("Checkout failed");
-      await fetchBorrows(); // refresh borrowed list
-      await fetchReservations(); // refresh reservations
-    } catch (err) {
-      console.error("Checkout error:", err);
-    }
-  };
+  //     if (!res.ok) throw new Error("Checkout failed");
+  //     await fetchBorrows(); // refresh borrowed list
+  //     await fetchReservations(); // refresh reservations
+  //   } catch (err) {
+  //     console.error("Checkout error:", err);
+  //   }
+  // };
    const handleReturn = async (borrowId: string) => {
     try {
       const res = await fetch(`/api/borrow/${borrowId}`, {

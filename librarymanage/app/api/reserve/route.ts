@@ -20,32 +20,53 @@ export async function POST(req: Request) {
     // Check book availability
     const book = await prisma.book.findUnique({
       where: { id: bookId },
-      select: { available: true }
+      select: { available: true,title:true }
     });
 
     if (!book || book.available <= 0) {
       return NextResponse.json({ error: "Book not available" }, { status: 400 });
     }
 
-    // Create reservation
-    const reservation = await prisma.reservation.create({
-      data: {
-        reservationNumber: `RES-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        bookId,
-        memberId,
-        status: "PENDING",
-        reservedAt: new Date(),
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // expires in 7 days
-      }
+     const member = await prisma.user.findUnique({
+      where: { id: memberId },
+      select: { userFirstName: true, userLastName: true },
     });
+    if(!member){
+      return NextResponse.json({ error: "Member not found" }, { status: 404 });
+    }
+
+    // Create reservation
+    // const reservation = await prisma.reservation.create({
+    //   data: {
+    //     reservationNumber: `RES-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    //     bookId,
+    //     memberId,
+    //     status: "PENDING",
+    //     reservedAt: new Date(),
+    //     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // expires in 7 days
+    //   },
+    //   include: { book: true, member: true },
+    // });
 
     // Reduce available count
-    await prisma.book.update({
-      where: { id: bookId },
-      data: { available: { decrement: 1 } }
+    // await prisma.book.update({
+    //   where: { id: bookId },
+    //   data: { available: { decrement: 1 } }
+    // });
+
+
+     await prisma.notification.create({
+      data: {
+        type: "RESERVATION_REQUEST",
+        message: `${member.userFirstName} ${member.userLastName} requested to reserve "${book.title}"`,
+        status: "PENDING",
+        action:"RESERVE",
+        memberId: memberId,
+        bookId: bookId, //  // 🔹 here we don’t have direct transaction, you may adapt schema
+      },
     });
 
-    return NextResponse.json({ message: "Book reserved successfully", reservation });
+    return NextResponse.json({ message: "Reservation request sent" });
   } catch (error) {
     console.error("Error creating reservation:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

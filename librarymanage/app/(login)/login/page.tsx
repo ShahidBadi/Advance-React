@@ -46,7 +46,12 @@ export default function LoginPage() {
         } else if (usertype === 'Student') {
           router.push('/user');
           return;
-        } else {
+        } 
+        else if(usertype==='Librarian'){
+          router.push('/librarian')
+          return;
+        }
+        else {
           setMessage("You don't redirect anywhere");
         }
 

@@ -6,6 +6,7 @@ const prisma = new PrismaClient();
 export async function GET() {
   try {
     const notifications = await prisma.notification.findMany({
+      where:{status:"PENDING"},
       orderBy: { createdAt: "desc" },
       include: {
         member: true,        // who requested

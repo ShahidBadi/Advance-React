@@ -28,29 +28,25 @@ export default function BrowseBooksPage() {
     fetchBooks()
   },[])
 
- async function handlereserve(bookid: any) {
-  console.log("log id", bookid);
+ const handlereserve = async (bookId: string) => {
   try {
     const res = await fetch("/api/reserve", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bookId: bookid }),
+      body: JSON.stringify({ bookId}), // current logged-in user
     });
 
     const data = await res.json();
-
-    if (!res.ok) {
-      alert(`Error: ${data.error || "Something went wrong"}`);
-      return;
+    if (res.ok) {
+      alert(data.message);
+    } else {
+      alert(data.error);
     }
-
-    alert("Book reserved successfully!");
-    fetchBooks(); // ✅ refresh list so available count updates
   } catch (err) {
     console.error("Reserve error:", err);
-    alert("Failed to reserve book");
+    alert("Something went wrong while reserving");
   }
-}
+};
 
 
   return (

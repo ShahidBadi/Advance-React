@@ -255,6 +255,8 @@ export default function TransactionPage() {
   const [borrowbookid, setborrowbookid] = useState("");
   const [borrowmemberid, setborrowmemberid] = useState("")
   const [borrowdueDate, setborrowduedate] = useState("")
+  const [returnTrxId, setReturnTrxId] = useState("");
+
   useEffect(() => {
     const fetchBook = async () => {
       try {
@@ -391,6 +393,38 @@ export default function TransactionPage() {
     }
   };
 
+const handleReturn = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!returnTrxId) {
+    alert("Please enter transaction ID");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/transaction/return", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trxNumber: returnTrxId }),
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert(data.message);
+      setReturnTrxId("");
+
+      // Refresh transactions
+      const txRes = await fetch("/api/transaction");
+      const txData = await txRes.json();
+      setBorrows(txData.borrows || []);
+    } else {
+      alert(data.error);
+    }
+  } catch (err) {
+    console.error("Return error:", err);
+    alert("Something went wrong while returning the book!");
+  }
+};
+
   return (
     <div className="container-fluid text-white">
       <div className="row">
@@ -399,7 +433,99 @@ export default function TransactionPage() {
           <h2 className="page-title mb-4">Transactions</h2>
 
           {/* Borrow & Return Section */}
-          
+          <div className="row mb-4">
+            {/* Borrow Book */}
+            <div className="col-md-6">
+              <div className="card bg-dark border-secondary">
+                <div className="card-header">
+                  <h5 className="mb-0">Borrow a Book</h5>
+                </div>
+                <div className="card-body">
+                  <form onSubmit={handleborrow}>
+                    <div className="mb-3">
+                      <label className="form-label">Member</label>
+                      <select className="form-select"
+                        value={borrowmemberid}
+                        onChange={(e) => setborrowmemberid(e.target.value)}>
+                        <option>Select a member</option>
+                        {member.map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.userName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Book</label>
+                      <select className="form-select"
+                        value={borrowbookid}
+                        onChange={(e) => setborrowbookid(e.target.value)}>
+                        <option value="">Select Book</option>
+                        {books.map((book) => (
+                          <option key={book.id} value={book.id}>
+                            {book.title}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Due Date</label>
+                      <input type="date" className="form-control"
+                        value={borrowdueDate}
+                        onChange={(e) => setborrowduedate(e.target.value)} />
+                    </div>
+                    <button type="submit" className="btn btn-primary w-100">
+                      Process Borrow
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            {/* Return Book */}
+            <div className="col-md-6">
+              <div className="card bg-dark border-secondary">
+                <div className="card-header">
+                  <h5 className="mb-0">Return a Book</h5>
+                </div>
+                <div className="card-body">
+                  <form onSubmit={handleReturn}>
+                    <div className="mb-3">
+                      <label className="form-label">Transaction ID</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter transaction ID"
+                        value={returnTrxId}
+                        onChange={(e)=>setReturnTrxId(e.target.value)}
+                      />
+                    </div>
+                    {/* <div className="mb-3">
+                      <label className="form-label">Condition</label>
+                      <select className="form-select">
+                        <option>Select condition</option>
+                        <option>Excellent</option>
+                        <option>Good</option>
+                        <option>Fair</option>
+                        <option>Damaged</option>
+                      </select>
+                    </div> */}
+                    {/* <div className="mb-3">
+                      <label className="form-label">Notes</label>
+                      <textarea
+                        className="form-control"
+                        rows={2}
+                        placeholder="Any additional notes"
+                      ></textarea>
+                    </div> */}
+                    <button type="submit" className="btn btn-success w-100">
+                      Process Return
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Transaction History */}
           <div className="card bg-dark border-secondary">
@@ -498,8 +624,8 @@ export default function TransactionPage() {
                       className="list-group-item bg-dark text-white border-secondary d-flex justify-content-between align-items-center"
                     >
                       <span>
-                        📖 {note.member.userFirstName} {note.member.userLastName}{" "}
-                        requested to renew "{note.transaction.book.title}"
+                        📖 {note.member?.userFirstName} {note.member?.userLastName}{" "}
+                        requested to renew "{note.transaction?.book?.title}"
                       </span>
                       <div>
                         <button

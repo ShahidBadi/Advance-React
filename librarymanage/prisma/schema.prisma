@@ -12,6 +12,7 @@ datasource db {
 enum UserType {
   Admin
   Student
+  Librarian
 }
 
 enum TransactionStatus {
@@ -27,6 +28,11 @@ enum ReservationStatus {
   READY_FOR_PICKUP
   CANCELLED
   FULFILLED
+}
+
+enum requestaction{
+    RESERVE
+    RENEW
 }
 
 /// Models
@@ -106,6 +112,8 @@ model Reservation {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
+    notifications     Notification[]
+
   @@index([memberId])
   @@index([bookId])
 }
@@ -126,17 +134,22 @@ model Borrow {
 }
 
 model Notification {
-  id            String       @id @default(auto()) @map("_id") @db.ObjectId
-  type          String       // e.g. "RENEW_REQUEST", "RETURN_REQUEST"
-  message       String       // Text to display in admin notifications
-  status        String       @default("PENDING") // PENDING | APPROVED | REJECTED | READ
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  type          String
+  message       String
+  status        String        @default("PENDING")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  action        requestaction
 
   // Relations
   memberId      String
-  member        User         @relation("UserNotifications", fields: [memberId], references: [id])
+  member        User          @relation("UserNotifications", fields: [memberId], references: [id])
 
-  transactionId String
-  transaction   Transaction  @relation("TransactionNotifications", fields: [transactionId], references: [id])
+  transactionId String?       // optional
+  transaction   Transaction?  @relation("TransactionNotifications", fields: [transactionId], references: [id])
+
+  reservationId String?       // optional
+  reservation   Reservation?  @relation(fields: [reservationId], references: [id])
 }
+

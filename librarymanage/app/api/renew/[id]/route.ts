@@ -46,6 +46,7 @@ export async function PUT(
         type: "RENEW_REQUEST",
         message: `${transaction.member.userFirstName} ${transaction.member.userLastName} requested renewal for "${transaction.book.title}"`,
         status: "PENDING",
+        action:"RENEW",
         memberId: transaction.memberId,
         transactionId: transaction.id,
       },
