@@ -4,6 +4,10 @@ import React, { useEffect, useState, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+
+import { useRouter } from 'next/navigation'
+import { isLoggedIn } from "@/app/lib/auth";
+
 interface Book {
   id: string;
   title: string;
@@ -17,6 +21,7 @@ interface Book {
 }
 
 export default function BooksPage() {
+  const router=useRouter();
   const [books, setBooks] = useState<any[]>([]);
   const [editBook, setEditBook] = useState<any>(null);
   const [form, setForm] = useState({
@@ -42,7 +47,14 @@ export default function BooksPage() {
   }
 
   useEffect(() => {
-    fetchBooks();
+    
+    if(!isLoggedIn()){
+      router.push("/login")
+      return;
+    }else{
+      fetchBooks();
+    }
+    
   }, []);
 
   const handleChange = (e: any) => {

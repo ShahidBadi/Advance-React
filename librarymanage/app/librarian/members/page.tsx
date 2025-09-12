@@ -33,7 +33,7 @@ export default function MembersPage() {
   // Fetch members
   async function fetchMembers() {
     try {
-      const res = await fetch("/api/member");
+      const res = await fetch("/api/memberlibrarian");
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
 

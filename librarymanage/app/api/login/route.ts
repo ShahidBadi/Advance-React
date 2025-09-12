@@ -1,9 +1,12 @@
 import { PrismaClient } from "@/app/generated/prisma";
 import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
+  const JWT_SECRET=process.env.JWT_SECRET;
+  if (!JWT_SECRET) throw new Error("JWT_SECRET not set in .env file");
   try {
     const body = await req.json();
     console.log("body is:", body);
@@ -30,11 +33,13 @@ export async function POST(req: Request) {
         { status: 401 }
       );
     }
-    
+    const token=jwt.sign({id:user.id,email:user.userEmail},JWT_SECRET,{
+      expiresIn:"1h"
+    })
 
     // ✅ Create a NextResponse instance first
     const response = NextResponse.json(
-      { message: "login successful", user },
+      { message: "login successful", user,token },
       { status: 200 }
     );
 
@@ -44,6 +49,7 @@ export async function POST(req: Request) {
       path: "/",
       maxAge: 60 * 60 * 24,
     });
+    
 
     return response;
   } catch (err) {

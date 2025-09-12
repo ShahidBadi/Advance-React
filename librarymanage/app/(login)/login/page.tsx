@@ -38,6 +38,7 @@ export default function LoginPage() {
       const data = await res.json();
       if (res.ok) {
         setMessage('login successful');
+        localStorage.setItem('token',data.token)
         // const type = data.userType.toLowerCase();
         if (usertype === 'Admin') {
           console.log("item set seccessfully")
@@ -96,6 +97,7 @@ export default function LoginPage() {
                     <option value="">Select type</option>
                     <option value="Admin">Admin</option>
                     <option value="Student">Student</option>
+                    <option value="Librarian">Librarian</option>
                   </select>
                 </div>
                 {/* <div className="form-check mb-4">

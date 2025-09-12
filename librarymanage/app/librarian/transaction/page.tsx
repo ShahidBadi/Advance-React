@@ -438,7 +438,7 @@ const handleReturn = async (e: React.FormEvent) => {
             <div className="col-md-6">
               <div className="card bg-dark border-secondary">
                 <div className="card-header">
-                  <h5 className="mb-0">Borrow a Book</h5>
+                  <h5 className="mb-0" style={{color:"white"}}>Borrow a Book</h5>
                 </div>
                 <div className="card-body">
                   <form onSubmit={handleborrow}>
@@ -486,7 +486,7 @@ const handleReturn = async (e: React.FormEvent) => {
             <div className="col-md-6">
               <div className="card bg-dark border-secondary">
                 <div className="card-header">
-                  <h5 className="mb-0">Return a Book</h5>
+                  <h5 className="mb-0" style={{color:"white"}}>Return a Book</h5>
                 </div>
                 <div className="card-body">
                   <form onSubmit={handleReturn}>
@@ -530,7 +530,7 @@ const handleReturn = async (e: React.FormEvent) => {
           {/* Transaction History */}
           <div className="card bg-dark border-secondary">
             <div className="card-header d-flex justify-content-between align-items-center">
-              <h5 className="mb-0">Transaction History</h5>
+              <h5 className="mb-0" style={{color:"white"}}>Transaction History</h5>
               <select className="form-select form-select-sm w-auto">
                 <option>All Transactions</option>
                 <option>Borrowed</option>
@@ -607,7 +607,7 @@ const handleReturn = async (e: React.FormEvent) => {
         <div className="col-md-3">
           <div className="card bg-dark border-secondary">
             <div className="card-header d-flex justify-content-between align-items-center">
-              <h5 className="mb-0">Notifications</h5>
+              <h5 className="mb-0" style={{color:"white"}}>Notifications</h5>
               <button
                 className="btn btn-sm btn-outline-light"
                 onClick={() => window.location.reload()}

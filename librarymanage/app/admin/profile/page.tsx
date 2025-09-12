@@ -16,7 +16,13 @@ export default async function ProfilePage() {
     }
     const user=await prisma.user.findUnique({where:{id:userid}})
 
-    
+    if(!user){
+      return <p className="text-danger">User not found</p>;
+    }
+
+     if (user.userType !== "Admin") {
+    return <p className="text-warning">Access denied. Only Admins can view this page.</p>;
+  }
   return (
     <div className="container-fluid text-white">
       <h2 className="page-title">User Profile</h2>

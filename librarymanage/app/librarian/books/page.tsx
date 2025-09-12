@@ -156,14 +156,14 @@ export default function BooksPage() {
     <div className="container-fluid text-white">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="page-title">Books Management</h2>
-        <button
+        {/* <button
           className="btn btn-outline-light"
           data-bs-toggle="modal"
           data-bs-target="#addBookModal"
         >
           <i className="bi bi-plus-circle me-2"></i>
           Add New Book
-        </button>
+        </button> */}
       </div>
 
       <div className="card bg-dark text-white border-secondary">
@@ -181,7 +181,7 @@ export default function BooksPage() {
                   <th>Type</th>
                   <th>Quantity</th>
                   <th>Available</th>
-                  <th>Actions</th>
+                  {/* <th>Actions</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -194,7 +194,7 @@ export default function BooksPage() {
                     <td>{book.quantity ?? book.Quantity}</td>
                     <td>{book.available ?? "-"}</td>
                     <td>
-                      <button
+                      {/* <button
                         className="btn btn-sm btn-outline-info me-2"
                         data-bs-toggle="modal"
                         data-bs-target="#editBookModal"
@@ -204,7 +204,7 @@ export default function BooksPage() {
                       </button>
                       <button className="btn btn-sm btn-outline-danger" onClick={()=>{handleDelete(book.id)}}>
                         <i className="bi bi-trash"></i>
-                      </button>
+                      </button> */}
                     </td>
                   </tr>
                 ))}

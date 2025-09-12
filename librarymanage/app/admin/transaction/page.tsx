@@ -404,7 +404,7 @@ export default function TransactionPage() {
           {/* Transaction History */}
           <div className="card bg-dark border-secondary">
             <div className="card-header d-flex justify-content-between align-items-center">
-              <h5 className="mb-0">Transaction History</h5>
+              <h5 className="mb-0" style={{color:"white"}}>Transaction History</h5>
               <select className="form-select form-select-sm w-auto">
                 <option>All Transactions</option>
                 <option>Borrowed</option>

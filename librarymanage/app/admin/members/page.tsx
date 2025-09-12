@@ -2,6 +2,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import { isLoggedIn } from "@/app/lib/auth";
+import { useRouter } from "next/navigation";
 
 interface Member {
   id: string;
@@ -15,6 +17,7 @@ interface Member {
 }
 
 export default function MembersPage() {
+  const router=useRouter();
   const [message, setMessage] = useState("");
   const [members, setMembers] = useState<Member[]>([]);
   const [editMember, setEditMember] = useState<Member | null>(null);
@@ -44,7 +47,13 @@ export default function MembersPage() {
   }
 
   useEffect(() => {
-    fetchMembers();
+    if(!isLoggedIn()){
+      router.push("/login")
+      return;
+    }else{
+      fetchMembers();
+    }
+    
   }, []);
 
   // handle input change
@@ -171,13 +180,13 @@ export default function MembersPage() {
     <div className="container-fluid text-white">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="page-title">Members Management</h2>
-        <button
+        {/* <button
           className="btn btn-primary"
           data-bs-toggle="modal"
           data-bs-target="#addMemberModal"
         >
           <i className="bi bi-person-plus me-1"></i> Add New Member
-        </button>
+        </button> */}
       </div>
 
       <div className="card bg-dark border-secondary">

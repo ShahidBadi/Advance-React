@@ -82,6 +82,25 @@ export default function MyBooksPage() {
   //     console.error("Checkout error:", err);
   //   }
   // };
+  const handleCancel = async (id: string) => {
+  try {
+    const res = await fetch(`/api/reserve/${id}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("Reservation cancelled successfully");
+      fetchReservations(); // refresh reservations list
+    } else {
+      alert(data.error || "Failed to cancel reservation");
+    }
+  } catch (err) {
+    console.error("Cancel error:", err);
+    alert("Something went wrong!");
+  }
+};
+
    const handleReturn = async (borrowId: string) => {
     try {
       const res = await fetch(`/api/borrow/${borrowId}`, {
@@ -103,7 +122,7 @@ export default function MyBooksPage() {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Book renewed successfully!");
+        alert("Book renewed request successfully");
         fetchBorrows(); // refresh list
       } else {
         alert(data.error || "Failed to renew book");
@@ -221,16 +240,10 @@ export default function MyBooksPage() {
                               </span>
                             </td>
                             <td>
-                              {now <= new Date(r.expiresAt) ? (
-                                <button className="btn btn-sm btn-outline-success"
-                                  onClick={() => { handleCheckout(r) }}>
-                                  <i className="bi bi-check-circle"></i> checkout
-                                </button>
-                              ) : (
-                                <button className="btn btn-sm btn-outline-danger">
+                               <button className="btn btn-sm btn-outline-danger"
+                               onClick={()=>{handleCancel(r.id)}}>
                                   <i className="bi bi-x-circle"></i> Cancel
                                 </button>
-                              )}
                             </td>
                           </tr>
                         ))

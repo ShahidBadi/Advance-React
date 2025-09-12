@@ -8,7 +8,7 @@ export async function GET() {
     const items = await prisma.user.findMany({
       where:{
       userType:{
-        in:["Student","Librarian"],
+        in:["Student"],
       }
     }
       });

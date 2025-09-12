@@ -26,13 +26,14 @@ interface Borrow {
 }
 export default function AdminDashboard() {
     const [borrows, setBorrows] = useState<Borrow[]>([]);
+    const [book,setbook]=useState("");
      
       useEffect(()=>{
          const fetchBorrows = async () => {
         try {
           const res = await fetch("/api/transaction");
           if (!res) {
-            throw new Error("failed to fetched")
+            throw new Error("failed to fetched transaction")
           }
           const data = await res.json();
           console.log("fetched borrows",data)
@@ -41,7 +42,21 @@ export default function AdminDashboard() {
           console.error("Error fetching borrows:", err);
         }
       };
+      const fetchBooks=async()=>{
+        try{
+          const res = await fetch("/api/book");
+          if (!res) {
+            throw new Error("failed to fetched book")
+          }
+          const data = await res.json();
+          // console.log("fetched ",data)
+          setbook(data);
+        }catch (err) {
+          console.error("Error fetching books:", err);
+        }
+      }
       fetchBorrows()
+      fetchBooks()
       },[])
   return (
     <div className="container-fluid text-light">
@@ -53,24 +68,24 @@ export default function AdminDashboard() {
           <div className="card text-bg-dark border-primary">
             <div className="card-body d-flex justify-content-between align-items-center">
               <div>
-                <h6 className="text-muted text-uppercase">Total Books</h6>
-                <h2>8,542</h2>
+                <h6 className=" text-uppercase" style={{color:"white"}}>Total Books</h6>
+                <h2>{book.length}</h2>
               </div>
               <div className="icon-shape bg-primary p-3 rounded">
                 <i className="bi bi-book fs-4"></i>
               </div>
             </div>
-            <p className="text-success px-3 pb-2">
+            {/* <p className="text-success px-3 pb-2">
               <i className="bi bi-arrow-up"></i> 120 new this month
-            </p>
+            </p> */}
           </div>
         </div>
 
-        <div className="col-md-3">
+        {/* <div className="col-md-3">
           <div className="card text-bg-dark border-success">
             <div className="card-body d-flex justify-content-between align-items-center">
               <div>
-                <h6 className="text-muted text-uppercase">Active Members</h6>
+                <h6 className=" text-uppercase" style={{color:"white"}}>Active Members</h6>
                 <h2>1,248</h2>
               </div>
               <div className="icon-shape bg-success p-3 rounded">
@@ -81,30 +96,30 @@ export default function AdminDashboard() {
               <i className="bi bi-arrow-up"></i> 42 new this month
             </p>
           </div>
-        </div>
+        </div> */}
 
         <div className="col-md-3">
           <div className="card text-bg-dark border-warning">
             <div className="card-body d-flex justify-content-between align-items-center">
               <div>
-                <h6 className="text-muted text-uppercase">Borrowed Books</h6>
-                <h2>2,154</h2>
+                <h6 className=" text-uppercase" style={{color:"white"}}>Borrowed Books</h6>
+                <h2>{borrows.filter((b) => b.status === "BORROWED").length}</h2>
               </div>
               <div className="icon-shape bg-warning p-3 rounded">
                 <i className="bi bi-arrow-up-right-circle fs-4"></i>
               </div>
             </div>
-            <p className="text-danger px-3 pb-2">
+            {/* <p className="text-danger px-3 pb-2">
               <i className="bi bi-arrow-down"></i> 12 overdue
-            </p>
+            </p> */}
           </div>
         </div>
 
-        <div className="col-md-3">
+        {/* <div className="col-md-3">
           <div className="card text-bg-dark border-danger">
             <div className="card-body d-flex justify-content-between align-items-center">
               <div>
-                <h6 className="text-muted text-uppercase">Overdue Books</h6>
+                <h6 className="text-uppercase" style={{color:"white"}}>Overdue Books</h6>
                 <h2>47</h2>
               </div>
               <div className="icon-shape bg-danger p-3 rounded">
@@ -115,7 +130,7 @@ export default function AdminDashboard() {
               <i className="bi bi-clock"></i> 7 days average
             </p>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Transactions and Categories */}
