@@ -36,9 +36,12 @@ export default function LoginPage() {
       });
 
       const data = await res.json();
+      console.log(data.user.userType)
       if (res.ok) {
         setMessage('login successful');
         localStorage.setItem('token',data.token)
+
+        localStorage.setItem("usertype",data.user.userType)
         // const type = data.userType.toLowerCase();
         if (usertype === 'Admin') {
           console.log("item set seccessfully")

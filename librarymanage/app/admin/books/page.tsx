@@ -6,7 +6,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import { useRouter } from 'next/navigation'
-import { isLoggedIn } from "@/app/lib/auth";
+import { getuserrole, isLoggedIn } from "@/app/lib/auth";
 
 interface Book {
   id: string;
@@ -51,9 +51,12 @@ export default function BooksPage() {
     if(!isLoggedIn()){
       router.push("/login")
       return;
-    }else{
-      fetchBooks();
     }
+     if(getuserrole() !=="Admin"){
+            router.push("/")
+            return
+    }
+    fetchBooks()
     
   }, []);
 

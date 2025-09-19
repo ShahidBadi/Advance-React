@@ -4,6 +4,8 @@ import React, { useEffect, useState, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import { getuserrole, isLoggedIn } from "@/app/lib/auth";
+import { useRouter } from "next/navigation";
 interface Book {
   id: string;
   title: string;
@@ -40,8 +42,16 @@ export default function BooksPage() {
       console.error("Failed to fetch books:", err);
     }
   }
-
+const router=useRouter();
   useEffect(() => {
+    if(!isLoggedIn()){
+      router.push("/login")
+      return;
+    }
+    if(getuserrole()!=="Admin" && getuserrole()!=="Librarian"){
+      router.push("/")
+      return;
+    }
     fetchBooks();
   }, []);
 

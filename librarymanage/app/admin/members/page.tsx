@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { isLoggedIn } from "@/app/lib/auth";
+import { getuserrole, isLoggedIn } from "@/app/lib/auth";
 import { useRouter } from "next/navigation";
 
 interface Member {
@@ -50,10 +50,12 @@ export default function MembersPage() {
     if(!isLoggedIn()){
       router.push("/login")
       return;
-    }else{
-      fetchMembers();
     }
-    
+    if(getuserrole() !=="Admin"){
+        router.push("/")
+        return
+    }
+    fetchMembers()
   }, []);
 
   // handle input change

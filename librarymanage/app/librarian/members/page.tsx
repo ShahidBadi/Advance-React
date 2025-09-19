@@ -2,6 +2,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import { getuserrole, isLoggedIn } from "@/app/lib/auth";
+import { useRouter } from "next/navigation";
 
 interface Member {
   id: string;
@@ -15,6 +17,7 @@ interface Member {
 }
 
 export default function MembersPage() {
+  const router=useRouter();
   const [message, setMessage] = useState("");
   const [members, setMembers] = useState<Member[]>([]);
   const [editMember, setEditMember] = useState<Member | null>(null);
@@ -44,6 +47,14 @@ export default function MembersPage() {
   }
 
   useEffect(() => {
+    if(!isLoggedIn()){
+      router.push("/login")
+      return;
+    }
+    if(getuserrole()!=="Admin" && getuserrole()!=="Librarian"){
+      router.push("/")
+      return;
+    }
     fetchMembers();
   }, []);
 

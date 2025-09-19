@@ -1,14 +1,43 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+interface Book {
+  id: string;
+  title: string;
+  author: string;
+}
+interface Borrow {
+  id: string;
+  issuedAt: string;
+  dueAt: string;
+  status:string;
+  book: Book;
+}
 
 export default function UserDashboardPage() {
+  const [borrows, setBorrows] = useState<Borrow[]>([]);
+  const fetchBorrows = async () => {
+      try {
+        const res = await fetch("/api/borrow");
+        if (!res) {
+          throw new Error("failed to fetched")
+        }
+        const data = await res.json();
+        setBorrows(data.borrows || []);
+      } catch (err) {
+        console.error("Error fetching borrows:", err);
+        setBorrows([]);
+      }
+    };
+    useEffect(()=>{
+      fetchBorrows();
+    },[])
   return (
     <div className="page-section active">
       <h2 className="page-title">User Dashboard</h2>
 
       {/* Stats Cards */}
-      <div className="row mb-4">
+      {/* <div className="row mb-4">
         {[
           {
             title: 'Borrowed Books',
@@ -66,7 +95,7 @@ export default function UserDashboardPage() {
             </div>
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Borrowed Books Table */}
       <div className="row">
@@ -87,45 +116,23 @@ export default function UserDashboardPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {[
-                      {
-                        title: 'The Great Gatsby',
-                        author: 'F. Scott Fitzgerald',
-                        dueDate: 'Aug 15, 2023',
-                        cover:
-                          'https://via.placeholder.com/50x70/1a1a1a/cccccc?text=Gatsby',
-                      },
-                      {
-                        title: 'To Kill a Mockingbird',
-                        author: 'Harper Lee',
-                        dueDate: 'Aug 18, 2023',
-                        cover:
-                          'https://via.placeholder.com/50x70/1a1a1a/cccccc?text=Mockingbird',
-                      },
-                      {
-                        title: '1984',
-                        author: 'George Orwell',
-                        dueDate: 'Aug 10, 2023',
-                        cover:
-                          'https://via.placeholder.com/50x70/1a1a1a/cccccc?text=1984',
-                      },
-                    ].map((book, index) => (
+                    {borrows.map((b, index) => (
                       <tr key={index}>
                         <td>
                           <div className="d-flex align-items-center">
                             <img
-                              src={book.cover}
+                              
                               className="me-3"
                               alt="cover"
                               style={{ width: 35 }}
                             />
                             <div>
-                              <div>{book.title}</div>
-                              <small className="text-muted">{book.author}</small>
+                              <div>{b.book.title}</div>
+                              <small className="text-muted">{b.book.author}</small>
                             </div>
                           </div>
                         </td>
-                        <td>{book.dueDate}</td>
+                        <td>{new Date(b.dueAt).toLocaleDateString()}</td>
                         <td>
                           <span className="status-badge borrowed">Borrowed</span>
                         </td>
@@ -144,7 +151,7 @@ export default function UserDashboardPage() {
         </div>
 
         {/* Reading Progress */}
-        <div className="col-md-4">
+        {/* <div className="col-md-4">
           <div className="card mb-4">
             <div className="card-header">
               <h5 className="card-title mb-0">Reading Progress</h5>
@@ -192,7 +199,7 @@ export default function UserDashboardPage() {
               ))}
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

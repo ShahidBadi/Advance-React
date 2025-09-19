@@ -1,6 +1,8 @@
 'use client';
 
+import { isLoggedIn } from '@/app/lib/auth';
 import { error } from 'console';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 interface Book {
@@ -138,7 +140,12 @@ export default function MyBooksPage() {
     const due = new Date(dueDate);
     return now > due ? "Overdue ❌" : "Active ✅";
   };
+  const router=useRouter();
   useEffect(() => {
+    if(!isLoggedIn()){
+      router.push("/login")
+      return;
+    }
     fetchReservations();
     fetchBorrows();
   }, []);
@@ -265,7 +272,7 @@ export default function MyBooksPage() {
         {/* Right column: Summary + Limits */}
         <div className="col-md-4">
           {/* Borrowing Summary */}
-          <div className="card mb-4">
+          {/* <div className="card mb-4">
             <div className="card-header">
               <h5 className="card-title mb-0">Borrowing Summary</h5>
             </div>
@@ -291,10 +298,10 @@ export default function MyBooksPage() {
                 <strong>Jan 15, 2022</strong>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Borrowing Limits */}
-          <div className="card">
+          {/* <div className="card">
             <div className="card-header">
               <h5 className="card-title mb-0">Borrowing Limits</h5>
             </div>
@@ -320,7 +327,7 @@ export default function MyBooksPage() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

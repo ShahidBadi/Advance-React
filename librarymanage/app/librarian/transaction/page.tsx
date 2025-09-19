@@ -205,6 +205,8 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { useEffect, useState } from "react";
+import { getuserrole, isLoggedIn } from "@/app/lib/auth";
+import { useRouter } from "next/navigation";
 
 interface Book {
   id: string;
@@ -257,8 +259,7 @@ export default function TransactionPage() {
   const [borrowdueDate, setborrowduedate] = useState("")
   const [returnTrxId, setReturnTrxId] = useState("");
 
-  useEffect(() => {
-    const fetchBook = async () => {
+   const fetchBook = async () => {
       try {
         const res = await fetch("/api/book");
         if (!res.ok) throw new Error("failed to fetch");
@@ -272,9 +273,6 @@ export default function TransactionPage() {
         console.error("Error fetching borrows:", err);
       }
     };
-    fetchBook();
-  }, []);
-  useEffect(() => {
     const fetchmember = async () => {
       try {
         const res = await fetch("/api/member");
@@ -289,10 +287,6 @@ export default function TransactionPage() {
         console.error("Error fetching borrows:", err);
       }
     }
-    fetchmember();
-  }, [])
-  // Fetch transactions
-  useEffect(() => {
     const fetchBorrows = async () => {
       try {
         const res = await fetch("/api/transaction");
@@ -309,10 +303,6 @@ export default function TransactionPage() {
         console.error("Error fetching borrows:", err);
       }
     };
-    fetchBorrows();
-  }, []);
-
-  useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const res = await fetch("/api/notification");
@@ -325,8 +315,24 @@ export default function TransactionPage() {
         console.error("Error fetching notifications:", err);
       }
     };
+    const router=useRouter();
+  useEffect(() => {
+   if(!isLoggedIn())
+   {
+    router.push("/login")
+    return;
+   }
+   if(getuserrole()!=="Admin" && getuserrole()!=="Librarian")
+   {
+    router.push("/")
+    return;
+   }
+    fetchBook();
+    fetchmember();
+    fetchBorrows();
     fetchNotifications();
-  }, [])
+  }, []);
+ 
   const handleborrow = async (e: React.FormEvent) => {
   e.preventDefault();
 

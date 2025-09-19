@@ -7,6 +7,7 @@ import '../globals.css';
 import Link from 'next/link';
 import './layout.css';
 import { useRouter } from "next/navigation";
+import { getuserrole, isLoggedIn } from '../lib/auth';
 
 
 
@@ -17,10 +18,19 @@ import { useRouter } from "next/navigation";
 // };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const router=useRouter();
   useEffect(() => {
+    if(!isLoggedIn()){
+      router.push("/login")
+      return;
+    }
+    if(getuserrole()!== "Admin"){
+      router.push("/")
+      return;
+    }
   require('bootstrap/dist/js/bootstrap.bundle.min.js');
 }, []);
-    const router=useRouter();
+    
      const handlelogout= async ()=>{
           await fetch("/api/logout",{
             method:"POST"

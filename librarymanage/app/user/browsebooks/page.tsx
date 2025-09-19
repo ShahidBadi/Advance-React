@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './browsebook.css'; // dark mode styles here
+import { isLoggedIn } from '@/app/lib/auth';
+import { useRouter } from 'next/navigation';
 
 type Book = {
   title: string;
@@ -24,7 +26,12 @@ export default function BrowseBooksPage() {
       console.error("Failed to fetch books:", err);
     }
   }
+  const router=useRouter();
   useEffect(()=>{
+    if(!isLoggedIn()){
+      router.push("/login")
+      return;
+    }
     fetchBooks()
   },[])
 

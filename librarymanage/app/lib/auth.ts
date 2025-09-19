@@ -1,7 +1,12 @@
 // utils/auth.ts
-export function isLoggedIn(): boolean {
+export function isLoggedIn()
+ {
   if (typeof window === "undefined") return false;
 
-  const token = localStorage.getItem("token");
-  return !!token; // true if token exists
+  return !!localStorage.getItem("token");
+}
+
+export function getuserrole(){
+  if (typeof window === "undefined") return false;
+  return localStorage.getItem("usertype");
 }

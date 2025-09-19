@@ -33,7 +33,8 @@ export async function POST(req: Request) {
         { status: 401 }
       );
     }
-    const token=jwt.sign({id:user.id,email:user.userEmail},JWT_SECRET,{
+    
+    const token=jwt.sign({id:user.id,email:user.userEmail,userType:user.userType},JWT_SECRET,{
       expiresIn:"1h"
     })
 

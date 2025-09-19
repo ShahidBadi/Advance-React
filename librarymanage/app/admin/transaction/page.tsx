@@ -205,6 +205,8 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { useEffect, useState } from "react";
+import { getuserrole, isLoggedIn } from "@/app/lib/auth";
+import { useRouter } from "next/navigation";
 
 interface Book {
   id: string;
@@ -247,6 +249,7 @@ interface Notification {
 }
 
 export default function TransactionPage() {
+  const router = useRouter()
   const [borrows, setBorrows] = useState<Borrow[]>([]);
   const [message, setmessage] = useState<Borrow[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([])
@@ -255,108 +258,110 @@ export default function TransactionPage() {
   const [borrowbookid, setborrowbookid] = useState("");
   const [borrowmemberid, setborrowmemberid] = useState("")
   const [borrowdueDate, setborrowduedate] = useState("")
-  useEffect(() => {
-    const fetchBook = async () => {
-      try {
-        const res = await fetch("/api/book");
-        if (!res.ok) throw new Error("failed to fetch");
-        const data = await res.json();
+  const fetchBook = async () => {
+    try {
+      const res = await fetch("/api/book");
+      if (!res.ok) throw new Error("failed to fetch");
+      const data = await res.json();
 
 
-        console.log("fetched book", data)
-        setbooks(data || []);
+      console.log("fetched book", data)
+      setbooks(data || []);
 
-      } catch (err) {
-        console.error("Error fetching borrows:", err);
+    } catch (err) {
+      console.error("Error fetching borrows:", err);
+    }
+  };
+  const fetchmember = async () => {
+    try {
+      const res = await fetch("/api/member");
+      if (!res.ok) throw new Error("failed to fetch");
+      const data = await res.json();
+
+
+      console.log("fetched member", data)
+      setmember(data || []);
+
+    } catch (err) {
+      console.error("Error fetching borrows:", err);
+    }
+  }
+  const fetchBorrows = async () => {
+    try {
+      const res = await fetch("/api/transaction");
+      if (!res.ok) throw new Error("failed to fetch");
+      const data = await res.json();
+      setBorrows(data.borrows || []);
+
+      // filter pending renewals → notifications
+      const pending = (data.borrows || []).filter(
+        (b: Borrow) => b.renewRequestStatus === "PENDING"
+      );
+      setmessage(pending);
+    } catch (err) {
+      console.error("Error fetching borrows:", err);
+    }
+  };
+  const fetchNotifications = async () => {
+    try {
+      const res = await fetch("/api/notification");
+      if (!res.ok) throw new Error("Failed to fetch notifications");
+      const data = await res.json();
+      if (data.success) {
+        setNotifications(data.notifications || []);
       }
-    };
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+    }
+  };
+
+  useEffect(() => {
+      if (!isLoggedIn()) {
+        router.push("/login")
+        return;
+      }
+      if (getuserrole() !== "Admin") {
+        router.push("/")
+        return
+      }
     fetchBook();
-  }, []);
-  useEffect(() => {
-    const fetchmember = async () => {
-      try {
-        const res = await fetch("/api/member");
-        if (!res.ok) throw new Error("failed to fetch");
-        const data = await res.json();
-
-
-        console.log("fetched member", data)
-        setmember(data || []);
-
-      } catch (err) {
-        console.error("Error fetching borrows:", err);
-      }
-    }
-    fetchmember();
-  }, [])
-  // Fetch transactions
-  useEffect(() => {
-    const fetchBorrows = async () => {
-      try {
-        const res = await fetch("/api/transaction");
-        if (!res.ok) throw new Error("failed to fetch");
-        const data = await res.json();
-        setBorrows(data.borrows || []);
-
-        // filter pending renewals → notifications
-        const pending = (data.borrows || []).filter(
-          (b: Borrow) => b.renewRequestStatus === "PENDING"
-        );
-        setmessage(pending);
-      } catch (err) {
-        console.error("Error fetching borrows:", err);
-      }
-    };
+    fetchmember()
     fetchBorrows();
-  }, []);
-
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await fetch("/api/notification");
-        if (!res.ok) throw new Error("Failed to fetch notifications");
-        const data = await res.json();
-        if (data.success) {
-          setNotifications(data.notifications || []);
-        }
-      } catch (err) {
-        console.error("Error fetching notifications:", err);
-      }
-    };
     fetchNotifications();
-  }, [])
+
+  }, []);
   const handleborrow = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!borrowbookid || !borrowmemberid || !borrowdueDate) {
-    alert("please fill all fields");
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/borrow", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        bookId: borrowbookid,
-        memberId: borrowmemberid,
-        dueAt: borrowdueDate,
-      }),
-    });
-
-    const data = await res.json();
-    if (data.success) {
-      alert("Book borrowed successfully!");
-      setborrowbookid("");
-      setborrowduedate("");
-      setborrowmemberid("");
-    } else {
-      alert(data.message || "Borrow failed");
+    if (!borrowbookid || !borrowmemberid || !borrowdueDate) {
+      alert("please fill all fields");
+      return;
     }
-  } catch (err) {
-    console.error("error borrowed book", err);
-  }
-};
+
+    try {
+      const res = await fetch("/api/borrow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookId: borrowbookid,
+          memberId: borrowmemberid,
+          dueAt: borrowdueDate,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        alert("Book borrowed successfully!");
+        setborrowbookid("");
+        setborrowduedate("");
+        setborrowmemberid("");
+      } else {
+        alert(data.message || "Borrow failed");
+      }
+    } catch (err) {
+      console.error("error borrowed book", err);
+    }
+  };
 
 
   // Approve handler
@@ -399,12 +404,12 @@ export default function TransactionPage() {
           <h2 className="page-title mb-4">Transactions</h2>
 
           {/* Borrow & Return Section */}
-          
+
 
           {/* Transaction History */}
           <div className="card bg-dark border-secondary">
             <div className="card-header d-flex justify-content-between align-items-center">
-              <h5 className="mb-0" style={{color:"white"}}>Transaction History</h5>
+              <h5 className="mb-0" style={{ color: "white" }}>Transaction History</h5>
               <select className="form-select form-select-sm w-auto">
                 <option>All Transactions</option>
                 <option>Borrowed</option>
